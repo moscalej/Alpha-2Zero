@@ -23,13 +23,12 @@ class Board(Base_mill):
         return is_mill_or(player, self.board, self.complete_mill[place])
 
     def execute_move(self, player: int, remove: int, set_place: int, remove_opponent: int):
-        if remove != -1:
+        if remove != 24:
             self.board[remove] = 0
         self.board[set_place] = player
-        if remove_opponent != -1:
+        if remove_opponent != 24:
             self.board[remove_opponent] = 0
         self.move_count += 1
-
 
     def get_legal_moves(self, player: int) -> np.ndarray:
         """Returns all the legal moves for the given color.
@@ -37,17 +36,19 @@ class Board(Base_mill):
         @param color not used and came from previous version.        
         """
 
-
         return
 
     def make_a_move(self, player: int, move: np.ndarray):
-        pass
+        assert move.shape == (24, 5, 25)
+        piece, action, remove = np.unravel_index(move.argmax(), move.shape)
+        if action is 4:
+            self.execute_move(player, 24, piece, 24)
+        else:
+            self.execute_move(player, piece, self.adjacent[action], remove)
 
     def is_win(self, color):
         """Check whether the given player has collected a triplet in any direction; 
         @param color (1=white,-1=black)
         """
 
-
         pass
-
