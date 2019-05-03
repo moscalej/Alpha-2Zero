@@ -80,7 +80,7 @@ def isMill(player, board, pos1, pos2):
 	@param pos2: second position index
 	'''
 
-	if (board[pos1] == player and board[pos2] == player):
+	if (self.board[pos1] == player and board[pos2] == player):
 		return True
 	return False
 
