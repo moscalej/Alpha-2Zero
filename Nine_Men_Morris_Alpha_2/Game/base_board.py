@@ -15,7 +15,7 @@ class Base_mill:
             15: (5, 5), 5: (6, 0), 6: (6, 3), 7: (6, 6)
         }
 
-        self.board = [0] * 24
+        self.board = np.zeros(24)
 
         self.adjacent = {
             0: [None, 3, None, 1],

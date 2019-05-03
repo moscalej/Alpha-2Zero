@@ -31,12 +31,40 @@ class Board(Base_mill):
         self.move_count += 1
 
     def get_legal_moves(self, player: int) -> np.ndarray:
-        """Returns all the legal moves for the given color.
-        (1 for white, -1 for black)
-        @param color not used and came from previous version.        
         """
+        create mask of legal moves
+        :param player:
+        :type player:
+        :return:
+        :rtype:
+        """
+        action_mask = np.zeros((24, 5, 25), dtype=bool)
+        # if stage 1 add set options
+        if not self.is_stage_2():
+            legal_pos = np.where(self.board == 0)[0]
+            for pos in legal_pos:
+                if self.is_mill(player, pos):
+                    opp_pos = np.where(self.board == -player)[0]
+                    opp_pos = [opp_p for opp_p in opp_pos if not self.is_mill(-player, opp_p)]
+                    action_mask[pos, -1, opp_pos] = True
+                else:
+                    action_mask[pos, -1, -1] = True
+        else:
+            from_pos_cands = np.where(self.board == player)[0]
+            for from_pos in from_pos_cands:
+                mill_cands = [(orient, adj) for orient, adj in enumerate(self.adjacent[from_pos]) if
+                              adj != None and self.board[adj] == 0]
+                if_played_board = self.board.copy()
+                if_played_board[from_pos] = 0
+                for (orient, adj) in mill_cands:
+                    if self.is_mill(player, adj):
+                        opp_pos = np.where(self.board == -player)[0]
+                        opp_pos = [opp_p for opp_p in opp_pos if not self.is_mill(-player, opp_p)]
+                        action_mask[from_pos, orient, opp_pos] = True
+                    else:
+                        action_mask[from_pos, orient, -1] = True
 
-        return
+        return action_mask
 
     def make_a_move(self, player: int, move: np.ndarray):
         assert move.shape == (24, 5, 25)

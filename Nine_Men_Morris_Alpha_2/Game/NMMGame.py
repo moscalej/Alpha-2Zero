@@ -1,16 +1,8 @@
 from __future__ import print_function
 
 import numpy as np
-from  alpha_zero_general.Game import Game
-"""
-Game class implementation for the game of TicTacToe.
-Based on the OthelloGame then getGameEnded() was adapted to new rules.
+from alpha_zero_general.Game import Game
 
-Author: Evgeny Tyurin, github.com/evg-tyurin
-Date: Jan 5, 2018.
-
-Based on the OthelloGame by Surag Nair.
-"""
 class TicTacToeGame(Game):
     def __init__(self, n=3):
         """
