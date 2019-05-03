@@ -98,7 +98,7 @@ open git bash cmd
 git clone https://github.com/JernejHabjan/alpha-zero-general.git
 ```
 run install script in 
-> alpha-zero-general/rts/install.sh
+> alpha_zero_general/rts/install.sh
 
 ## Tensorflow-Gpu installation (Optional):
 ```pip install 'tensorflow-gpu==1.8'```
@@ -142,7 +142,7 @@ Add path to environmental variables and !important! restart Pycharm
 - place extracted files in folder to
 >alpha_zero_general/temp/
 - and overwrite config file in
->alpha-zero-general/rts/src/config_class.py
+>alpha_zero_general/rts/src/config_class.py
 - navigate to 
 >C:\Users\USER\alpha-zero-general\rts
 - run ```python pit.py```

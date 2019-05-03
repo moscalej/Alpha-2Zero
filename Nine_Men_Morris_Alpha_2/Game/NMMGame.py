@@ -1,10 +1,7 @@
 from __future__ import print_function
-import sys
-sys.path.append('..')
-from Game import Game
-from .NMMLogic import Board
-import numpy as np
 
+import numpy as np
+from  alpha_zero_general.Game import Game
 """
 Game class implementation for the game of TicTacToe.
 Based on the OthelloGame then getGameEnded() was adapted to new rules.

@@ -8,7 +8,7 @@ from .Connect4Logic import Board
 
 class Connect4Game(Game):
     """
-    Connect4 Game class implementing the alpha-zero-general Game interface.
+    Connect4 Game class implementing the alpha_zero_general Game interface.
     """
 
     def __init__(self, height=None, width=None, win_length=None, np_pieces=None):
