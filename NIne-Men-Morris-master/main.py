@@ -133,7 +133,7 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 			exit(0)
 		else:
 			board = evalBoard.board
-
+	# stage 2
 	endStagesFinished = False
 	while not endStagesFinished:
 
@@ -144,8 +144,7 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 		while not userHasMoved:
 			try:
 				pos = int(input("\nMove '1' piece: "))
-
-				while board[pos] != '1':
+				while board[pos] != '1':  # not your piece
 					pos = int(input("\nMove '1' piece: ")) 
 
 				userHasPlaced = False
@@ -181,7 +180,7 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 
 			except Exception:
 				print("You cannot move there")
-
+	# check if game ended
 		if getEvaluationStage23(board) == float('inf'):
 			print("You Win!")
 			exit(0)
