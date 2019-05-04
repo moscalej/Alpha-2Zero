@@ -2,58 +2,53 @@ from __future__ import print_function
 
 import numpy as np
 from alpha_zero_general.Game import Game
+from Nine_Men_Morris_Alpha_2.Game import NMMLogic
 
-class TicTacToeGame(Game):
-    def __init__(self, n=3):
-        """
-        initial parameters
-        :param n:
-        :type n:
-        """
-        self.n = n
+class MenMorris(Game):
+    def __init__(self, men_count):
+        self.men_count = men_count
+        self.actionSize = 24 * 5 * 25 + 1
 
     def getInitBoard(self):
         # return initial board (numpy board)
-        b = Board(self.n)
-        return np.array(b.pieces)
+        b = NMMLogic.Board()
+        return b.matrix_board
 
     def getBoardSize(self):
         # (a,b) tuple
-        return (self.n, self.n)
+        return (7, 7)
 
     def getActionSize(self):
         # return number of actions
-        return self.n*self.n + 1
+        return
 
     def getNextState(self, board: np.ndarray, player: int, action: int) -> (np.ndarray, int):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
-        if action == self.n*self.n:
+        if action == self.actionSize - 1:  #?? TODO validate probably end of game
             return (board, -player)
-        b = Board(self.n)
-        b.pieces = np.copy(board)
-        move = (int(action/self.n), action%self.n)
+
+        b = NMMLogic.Board()
+        b.matrix_board = np.copy(board)
+        move = b.decode_action(player, action)
         b.execute_move(move, player)
-        return (b.pieces, -player)
+        return (b.matrix_board, -player)
 
     def getValidMoves(self, board, player):
+        # TODO description here might be insufficient, compare to previous game implementations
         # return a fixed size binary vector
-        valids = [0]*self.getActionSize()
-        b = Board(self.n)
-        b.pieces = np.copy(board)
+        b = NMMLogic.Board()
+        b.matrix_board = np.copy(board)  #TODO ask coach for game stage??
         legalMoves = b.get_legal_moves(player)
-        if len(legalMoves)==0:
-            valids[-1]=1
-            return np.array(valids)
-        for x, y in legalMoves:
-            valids[self.n*x+y]=1
-        return np.array(valids)
+        legalMoves = legalMoves.reshape(-1)
+        # TODO extend action array, if no legalMoves add last element as 1, otherwise 0?
+        return legalMoves
 
     def getGameEnded(self, board, player):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
-        b = Board(self.n)
-        b.pieces = np.copy(board)
+        b = NMMLogic.Board()
+        b.matrix_board = np.copy(board)
 
         if b.is_win(player):
             return 1

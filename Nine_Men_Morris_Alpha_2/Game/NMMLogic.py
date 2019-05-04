@@ -66,9 +66,9 @@ class Board(Base_mill):
 
         return action_mask
 
-    def make_a_move(self, player: int, move: np.ndarray):
-        assert move.shape == (24, 5, 25)
-        piece, action, remove = np.unravel_index(move.argmax(), move.shape)
+    def decode_action(self, player: int, action: int):
+        # assert action.shape == (24, 5, 25)  #TODO action is int
+        piece, action, remove = np.unravel_index(action.argmax(), action.shape)
         if action is 4:
             self.execute_move(player, 24, piece, 24)
         else:
