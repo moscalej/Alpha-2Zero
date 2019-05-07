@@ -20,28 +20,27 @@ class MenMorris(Game):
 
     def getActionSize(self):
         # return number of actions
-        return
+        return self.actionSize
 
     def getNextState(self, board: np.ndarray, player: int, action: int) -> (np.ndarray, int):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
-        if action == self.actionSize - 1:  #?? TODO validate probably end of game
+
+        if action == (self.actionSize - 1):  #?? TODO validate probably end of game
             return (board, -player)
 
         b = NMMLogic.Board()
         b.matrix_board = np.copy(board)
-        move = b.decode_action(player, action)
-        b.execute_move(move, player)
+        b.decode_action(player, action)
         return (b.matrix_board, -player)
 
-    def getValidMoves(self, board, player):
-        # TODO description here might be insufficient, compare to previous game implementations
+    def getValidMoves(self, board, player, stage2):
         # return a fixed size binary vector
         b = NMMLogic.Board()
-        b.matrix_board = np.copy(board)  #TODO ask coach for game stage??
-        legalMoves = b.get_legal_moves(player)
+        b.matrix_board = np.copy(board)
+        legalMoves = b.get_legal_moves(player, stage2)
         legalMoves = legalMoves.reshape(-1)
-        # TODO extend action array, if no legalMoves add last element as 1, otherwise 0?
+        legalMoves.tolist().extend([0 if np.sum(legalMoves)> 0 else 1])
         return legalMoves
 
     def getGameEnded(self, board, player):

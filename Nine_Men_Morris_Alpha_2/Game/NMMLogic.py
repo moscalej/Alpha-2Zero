@@ -30,7 +30,7 @@ class Board(Base_mill):
             self.board[remove_opponent] = 0
         self.move_count += 1
 
-    def get_legal_moves(self, player: int) -> np.ndarray:
+    def get_legal_moves(self, player: int, stage2: bool) -> np.ndarray:
         """
         create mask of legal moves
         :param player:
@@ -38,9 +38,10 @@ class Board(Base_mill):
         :return:
         :rtype:
         """
+
         action_mask = np.zeros((24, 5, 25), dtype=bool)
         # if stage 1 add set options
-        if not self.is_stage_2():
+        if not stage2:
             legal_pos = np.where(self.board == 0)[0]
             for pos in legal_pos:
                 if self.is_mill(player, pos):
@@ -66,11 +67,11 @@ class Board(Base_mill):
 
         return action_mask
 
-    def decode_action(self, player: int, action: int):
-        # assert action.shape == (24, 5, 25)  #TODO action is int
-        piece, action, remove = np.unravel_index(action.argmax(), action.shape)
+    def decode_action(self, player: int, action_code: int):
+        # assert action.shape == (24, 5, 25)  # TODO action is int
+        piece, action, remove = np.unravel_index(action_code, (24, 5, 25))
         if action is 4:
-            self.execute_move(player, 24, piece, 24)
+            self.execute_move(player, 24, piece, remove)
         else:
             self.execute_move(player, piece, self.adjacent[action], remove)
 
