@@ -23,6 +23,11 @@ args = dotdict({
 })
 
 if __name__=="__main__":
+    # debug
+    import sys
+    # print(sys.getrecursionlimit())
+    # sys.setrecursionlimit(10000)
+    #
     g = Game(men_count=9)
     nnet = nn(g)
 
