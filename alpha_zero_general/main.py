@@ -1,6 +1,8 @@
 from Coach import Coach
-from othello.OthelloGame import OthelloGame as Game
-from othello.pytorch.NNet import NNetWrapper as nn
+
+# from othello.OthelloGame import OthelloGame as Game
+from Nine_Men_Morris_Alpha_2.Game.NMMGame import MenMorris as Game
+from Nine_Men_Morris_Alpha_2.keras.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
@@ -21,7 +23,7 @@ args = dotdict({
 })
 
 if __name__=="__main__":
-    g = Game(6)
+    g = Game(men_count=9)
     nnet = nn(g)
 
     if args.load_model:

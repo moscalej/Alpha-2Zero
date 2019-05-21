@@ -39,8 +39,8 @@ class MenMorris(Game):
         b = NMMLogic.Board()
         b.matrix_board = np.copy(board)
         legalMoves = b.get_legal_moves(player, stage2)
-        legalMoves = legalMoves.reshape(-1)
-        legalMoves.tolist().extend([0 if np.sum(legalMoves)> 0 else 1])
+        legalMoves = list(legalMoves.reshape(-1))
+        legalMoves.extend([0 if np.sum(legalMoves) > 0 else 1])
         return legalMoves
 
     def getGameEnded(self, board, player, stage2):
@@ -53,7 +53,8 @@ class MenMorris(Game):
             return player
         if b.is_win(-player, stage2):
             return -player
-        if b.has_legal_moves():
+        valid_moves = self.getValidMoves(board, player, stage2)
+        if np.sum(valid_moves):  # if no valid moves, draw
             return 0
         # draw has a very little value
         return 1e-4 * player
@@ -65,6 +66,7 @@ class MenMorris(Game):
     def getSymmetries(self, board, pi):
         # mirror, rotational
         assert(len(pi) == self.n**2+1)  # 1 for pass
+        # TODO find a way to arange 3000 elements of pie in quadratic shape that can be rotated and preserve game symmetries
         pi_board = np.reshape(pi[:-1], (self.n, self.n))
         l = []
 

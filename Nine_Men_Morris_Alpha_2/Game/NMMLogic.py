@@ -24,10 +24,13 @@ class Board(Base_mill):
 
     def execute_move(self, player: int, remove: int, set_place: int, remove_opponent: int):
         if remove != 24:
-            self.board[remove] = 0
-        self.board[set_place] = player
+            self.matrix_board[self.board_map[remove]] = 0
+            # self.board[remove] = 0
+        self.matrix_board[self.board_map[set_place]] = player
+        # self.board[set_place] = player
         if remove_opponent != 24:
-            self.board[remove_opponent] = 0
+            self.matrix_board[self.board_map[remove_opponent]] = 0
+            # self.board[remove_opponent] = 0
         self.move_count += 1
 
     def get_legal_moves(self, player: int, stage2: bool) -> np.ndarray:
@@ -70,7 +73,7 @@ class Board(Base_mill):
     def decode_action(self, player: int, action_code: int):
         # assert action.shape == (24, 5, 25)  # TODO action is int
         piece, action, remove = np.unravel_index(action_code, (24, 5, 25))
-        if action is 4:
+        if action == 4:
             self.execute_move(player, 24, piece, remove)
         else:
             self.execute_move(player, piece, self.adjacent[action], remove)
@@ -80,10 +83,10 @@ class Board(Base_mill):
         # if others player number of pieces is 2 you win
 
         unique, counts = np.unique(self.matrix_board, return_counts=True)
-        opp_count = dict(zip(unique, counts))[-player]
-        if opp_count < 2:
-            return True
-        if not np.sum(self.get_legal_moves(player, stage2)):
-            return True
+        if len(unique) > 2:  # if not it means early stages of the game, two players didn't play yet
+            opp_count = dict(zip(unique, counts))[-player]
+            if opp_count < 2:
+                return True
+            if not np.sum(self.get_legal_moves(player, stage2)):
+                return True
         return False
-
