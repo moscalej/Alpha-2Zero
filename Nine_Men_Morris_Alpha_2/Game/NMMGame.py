@@ -65,18 +65,17 @@ class MenMorris(Game):
 
     def getSymmetries(self, board, pi):
         # mirror, rotational
-        assert(len(pi) == self.n**2+1)  # 1 for pass
-        # TODO find a way to arange 3000 elements of pie in quadratic shape that can be rotated and preserve game symmetries
-        pi_board = np.reshape(pi[:-1], (self.n, self.n))
+        # assert(len(pi) == self.n**2+1)  # 1 for pass
+        pi_board = np.reshape(pi[:-1], (24, 5, 25))
         l = []
 
         for i in range(1, 5):
             for j in [True, False]:
                 newB = np.rot90(board, i)
-                newPi = np.rot90(pi_board, i)
+                newPi = np.rot90(pi_board, i)  # TODO check if this rotation is correct
                 if j:
                     newB = np.fliplr(newB)
-                    newPi = np.fliplr(newPi)
+                    newPi = np.fliplr(newPi) # TODO check if this flip is correct
                 l += [(newB, list(newPi.ravel()) + [pi[-1]])]
         return l
 
