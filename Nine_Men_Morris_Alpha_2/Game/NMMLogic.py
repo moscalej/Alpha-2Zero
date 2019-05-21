@@ -75,9 +75,15 @@ class Board(Base_mill):
         else:
             self.execute_move(player, piece, self.adjacent[action], remove)
 
-    def is_win(self, color):
-        """Check whether the given player has collected a triplet in any direction; 
-        @param color (1=white,-1=black)
-        """
+    def is_win(self, player, stage2):
 
-        pass
+        # if others player number of pieces is 2 you win
+
+        unique, counts = np.unique(self.matrix_board, return_counts=True)
+        opp_count = dict(zip(unique, counts))[-player]
+        if opp_count < 2:
+            return True
+        if not np.sum(self.get_legal_moves(player, stage2)):
+            return True
+        return False
+

@@ -43,20 +43,20 @@ class MenMorris(Game):
         legalMoves.tolist().extend([0 if np.sum(legalMoves)> 0 else 1])
         return legalMoves
 
-    def getGameEnded(self, board, player):
+    def getGameEnded(self, board, player, stage2):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
         b = NMMLogic.Board()
         b.matrix_board = np.copy(board)
 
-        if b.is_win(player):
-            return 1
-        if b.is_win(-player):
-            return -1
+        if b.is_win(player, stage2):
+            return player
+        if b.is_win(-player, stage2):
+            return -player
         if b.has_legal_moves():
             return 0
-        # draw has a very little value 
-        return 1e-4
+        # draw has a very little value
+        return 1e-4 * player
 
     def getCanonicalForm(self, board, player):
         # return state if player==1, else return -state if player==-1
