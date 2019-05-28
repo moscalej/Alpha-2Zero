@@ -5,7 +5,7 @@ class Base_mill:
     def __init__(self):
         "Set up initial board configuration."
 
-        self.matrix_board = np.zeros([7, 7])
+        self.matrix_board = np.zeros([7, 7], dtype=int)
         self.board_map = {
             0: (0, 0), 1: (0, 3), 2: (0, 6), 8: (1, 1),
             9: (1, 3), 10: (1, 5), 16: (2, 2), 17: (2, 3),

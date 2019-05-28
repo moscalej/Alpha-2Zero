@@ -45,7 +45,7 @@ class Board(Base_mill):
         action_mask = np.zeros((24, 5, 25), dtype=bool)
         # if stage 1 add set options
         if not stage2:
-            legal_pos = np.where(self.board == 0)[0]
+            legal_pos = np.where(np.array(self.board) == 0)[0]
             for pos in legal_pos:
                 if self.is_mill(player, pos):
                     opp_pos = np.where(self.board == -player)[0]
@@ -73,7 +73,7 @@ class Board(Base_mill):
     def decode_action(self, player: int, action_code: int):
         # assert action.shape == (24, 5, 25)  # TODO action is int
         piece, action, remove = np.unravel_index(action_code, (24, 5, 25))
-        if action == 4:
+        if action == 4:  #
             self.execute_move(player, 24, piece, remove)
         else:
             self.execute_move(player, piece, self.adjacent[action], remove)

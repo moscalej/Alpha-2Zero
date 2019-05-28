@@ -69,7 +69,7 @@ class MCTS():
 
         if s not in self.Es:
             self.Es[s] = self.game.getGameEnded(canonicalBoard, 1, stage2)
-        if self.Es[s]!=0:
+        if self.Es[s] != 0:
             # terminal node
             return -self.Es[s]
 
@@ -116,7 +116,7 @@ class MCTS():
 
         v = self.search(next_s, stage2)
 
-        if (s,a) in self.Qsa:
+        if (s,a) in self.Qsa:  # if (s,a) exists, update, otherwise, set
             self.Qsa[(s,a)] = (self.Nsa[(s,a)]*self.Qsa[(s,a)] + v)/(self.Nsa[(s,a)]+1)
             self.Nsa[(s,a)] += 1
 

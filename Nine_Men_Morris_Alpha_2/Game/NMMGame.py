@@ -28,7 +28,6 @@ class MenMorris(Game):
 
         if action == (self.actionSize - 1):  #?? TODO validate probably end of game
             return (board, -player)
-
         b = NMMLogic.Board()
         b.matrix_board = np.copy(board)
         b.decode_action(player, action)
@@ -38,6 +37,7 @@ class MenMorris(Game):
         # return a fixed size binary vector
         b = NMMLogic.Board()
         b.matrix_board = np.copy(board)
+        b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys()))+1)]
         legalMoves = b.get_legal_moves(player, stage2)
         legalMoves = list(legalMoves.reshape(-1))
         legalMoves.extend([0 if np.sum(legalMoves) > 0 else 1])
