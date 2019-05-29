@@ -69,3 +69,28 @@ class Base_mill:
             22: [6, 14, 21, 23],
             23: [18, 20, 21, 22],
         }
+
+        self.bits_map = {
+            0: tuple(np.array([(0, 1), (0, 5), (1, 0), (1, 6), (5, 0), (5, 6), (6, 1), (6, 5)]).T),  # LSB
+            1: tuple(np.array([(0, 2), (0, 4), (2, 0), (2, 6), (4, 0), (4, 6), (6, 2), (6, 4)]).T),  #
+            2: tuple(np.array([(1, 2), (1, 4), (2, 1), (2, 5), (4, 1), (4, 5), (5, 2), (5, 4)]).T),  #
+            3: tuple(np.array([(3, 3)]).T)  # MSB
+        }
+        self.read_bits = {
+            0: (0, 1),  # LSB
+            1: (0, 2),
+            2: (1, 2),
+            3: (3, 3)   # MSB
+        }
+
+        def int_to_bin_string(self, i):
+            if i == 0:
+                return "0"
+            s = ''
+            while i:
+                if i & 1 == 1:
+                    s = "1" + s
+                else:
+                    s = "0" + s
+                i //= 2
+            return s

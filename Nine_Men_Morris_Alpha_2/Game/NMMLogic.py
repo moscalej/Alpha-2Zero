@@ -33,6 +33,8 @@ class Board(Base_mill):
             # self.board[remove_opponent] = 0
         self.move_count += 1
 
+        self.matrix_board = self.encode_next(self.matrix_board)
+
     def get_legal_moves(self, player: int, stage2: bool) -> np.ndarray:
         """
         create mask of legal moves
@@ -90,3 +92,36 @@ class Board(Base_mill):
             if not np.sum(self.get_legal_moves(player, stage2)):
                 return True
         return False
+
+
+    def encode_next(self):
+        """
+        updates board to have count + 1
+        count is shifted  steps 0,1,2,3 => 0, and then 4=>1, 5=>2, ect..
+        :return: None
+        """
+        steps = self.decode_step_count() + 1
+        bin_str = self.int_to_bin_string(steps)
+        for ind, val in enumerate(bin_str[::-1]):
+            self.matrix_board[self.bits_map[ind]] = val
+
+
+    def decode_step_count(self):
+        """
+        decode steps count from board encoding
+        count is shifted  steps 0,1,2,3 => 0, and then 4=>1, 5=>2, ect..
+        :return: int number of steps
+        """
+        steps = 0
+        for coor, pow in self.read_bits.items():
+            steps += self.matrix_board[coor] ** 2
+        return steps
+
+
+    def isStage2(self):
+        """
+        check if
+        :return: bool answering "is stage 2?"
+        """
+        return (self.decode_step_count() > 17 - 3)  # stage 2 from 18th step count is shifted
+
