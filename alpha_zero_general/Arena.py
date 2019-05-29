@@ -45,7 +45,7 @@ class Arena():
                 assert (self.display)
                 print("Turn ", str(it), "Player ", str(curPlayer))
                 self.display(board)
-            action = players[curPlayer + 1](self.game.getCanonicalForm(board, curPlayer))
+            action = players[curPlayer + 1](self.game.getCanonicalForm(board, curPlayer), (it > 18))
 
             valids = self.game.getValidMoves(self.game.getCanonicalForm(board, curPlayer), 1, stage2=(it > 18))
 

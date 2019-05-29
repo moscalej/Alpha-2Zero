@@ -563,7 +563,7 @@ class Configuration:
 
                  num_iters: int = 4,
                  num_eps: int = 4,
-                 temp_threshold: int = 15,
+                 temp_threshold: int = 25,
                  update_threshold: float = 0.6,
                  maxlen_of_queue: int = 6400,
                  num_mcts_sims: int = 10,

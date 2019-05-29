@@ -55,7 +55,7 @@ class MenMorris(Game):
         if b.is_win(-player, stage2):
             return -player
         valid_moves = self.getValidMoves(board, player, stage2)
-        if np.sum(valid_moves):  # if no valid moves, draw
+        if np.sum(valid_moves):  # game continues
             return 0
         # draw has a very little value
         return 1e-4 * player
