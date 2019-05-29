@@ -31,6 +31,7 @@ class MenMorris(Game):
         b = NMMLogic.Board()
         b.matrix_board = np.copy(board)
         b.decode_action(player, action)
+        # board = np.copy(b.matrix_board)
         return (b.matrix_board, -player)
 
     def getValidMoves(self, board, player, stage2):
