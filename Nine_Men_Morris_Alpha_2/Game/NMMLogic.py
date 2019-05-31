@@ -1,13 +1,11 @@
-'''
 
-'''
 # from bkcharts.attributes import color
 import numpy as np
 
 from Nine_Men_Morris_Alpha_2.Game.base_board import Base_mill
 
 
-def int_to_bin_string(self, i):
+def int_to_bin_string( i):
     if i == 0:
         return "0"
     s = ''
@@ -26,10 +24,6 @@ class Board(Base_mill):
     def __init__(self, matrix_board):
         super(Board, self).__init__()
         self.matrix_board = matrix_board
-        self.move_count = 0
-
-    def is_stage_2(self):
-        return self.move_count >= 18
 
     def is_mill(self, player: int, place: int) -> bool:
         ML = lambda player, board, pos1, pos2: board[pos1] == player and board[pos2] == player
@@ -45,11 +39,10 @@ class Board(Base_mill):
         if remove_opponent != 24:
             self.matrix_board[self.board_map[remove_opponent]] = 0
             # self.board[remove_opponent] = 0
-        self.move_count += 1
 
         self.encode_next()
 
-    def get_legal_moves(self, player: int, stage2: bool) -> np.ndarray:
+    def get_legal_moves(self, player: int) -> np.ndarray:
         """
         create mask of legal moves
         :param player:
@@ -57,7 +50,7 @@ class Board(Base_mill):
         :return:
         :rtype:
         """
-
+        stage2 = self.is_stage2()
         action_mask = np.zeros((24, 5, 25), dtype=bool)
         # if stage 1 add set options
         if not stage2:
@@ -73,7 +66,7 @@ class Board(Base_mill):
             from_pos_cands = np.where(self.board == player)[0]
             for from_pos in from_pos_cands:
                 mill_cands = [(orient, adj) for orient, adj in enumerate(self.adjacent[from_pos]) if
-                              adj != None and self.board[adj] == 0]
+                              adj is None and self.board[adj] == 0]
                 if_played_board = self.board.copy()
                 if_played_board[from_pos] = 0
                 for (orient, adj) in mill_cands:
@@ -94,7 +87,7 @@ class Board(Base_mill):
         else:
             self.execute_move(player, piece, self.adjacent[action], remove)
 
-    def is_win(self, player, stage2):
+    def is_win(self, player):
 
         # if others player number of pieces is 2 you win
 
@@ -103,7 +96,7 @@ class Board(Base_mill):
             opp_count = dict(zip(unique, counts))[-player]
             if opp_count < 2:
                 return True
-            if not np.sum(self.get_legal_moves(player, stage2)):
+            if not np.sum(self.get_legal_moves(player)):
                 return True
         return False
 
@@ -142,9 +135,9 @@ class Board(Base_mill):
         bit0 = self.matrix_board[self.read_bits[0]]
         return int(f'0b{bit3}{bit2}{bit1}{bit0}', 2)
 
-    def isStage2(self):
+    def is_stage2(self):
         """
         check if
         :return: bool answering "is stage 2?"
         """
-        return (self.decode_step_count() > 17 - 3)  # stage 2 from 18th step count is shifted
+        return self.decode_step_count() > 17 - 3  # stage 2 from 18th step count is shifted
