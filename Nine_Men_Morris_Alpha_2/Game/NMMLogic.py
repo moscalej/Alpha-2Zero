@@ -88,18 +88,22 @@ class Board(Base_mill):
             self.execute_move(player, piece, self.adjacent[action], remove)
 
     def is_win(self, player):
-
-        # if others player number of pieces is 2 you win
-        # TODO this is not ok
-        step = self.decode_step_count()
-        if step >= 14:
-            unique, counts = np.unique(self.matrix_board, return_counts=True)
-            if len(unique) > 2:  # if not it means early stages of the game, two players didn't play yet
-                opp_count = dict(zip(unique, counts))[-player]
-                if opp_count < 2:
-                    return True
-                if not np.sum(self.get_legal_moves(player)):
-                    return True
+        """  TODO: make sure that this is used in the end of player turn, and evaluated with the new board for the player that played
+        Game ends only in stage 2, in one of two cases:
+            1) the opponent has 2 pieces
+            2) the opponent has no legal moves left
+        :param player: The player that just played
+        :return: bool indicating if player has won
+        """
+        if not self.is_stage2():
+            return False
+        board = self.get_clean_board()
+        unique, counts = np.unique(board, return_counts=True)
+        opp_count = dict(zip(unique, counts))[-player]
+        if opp_count < 2:
+            return True
+        if not np.sum(self.get_legal_moves(-player, self.is_stage2())):
+            return True
         return False
 
     def encode_next(self):
@@ -112,7 +116,7 @@ class Board(Base_mill):
         if steps >= 17 - 4:
             return
         debug = np.sum(np.sum(np.abs(self.matrix_board)))
-        if steps == 0 and debug <= 4:
+        if debug < 4:  # TODO: I think is sufficient condition rather than steps==0 and debug<=4; for step 4 we expect 1
             return
 
         self.encode_step_count(steps + 1)
@@ -128,10 +132,10 @@ class Board(Base_mill):
         count is shifted  steps 0,1,2,3 => 0, and then 4=>1, 5=>2, ect..
         :return: int number of steps
         """
-        # TODO remove this after talk, problem this only returns a even number from [0,2,4,6,8]
+        # TODO decide which one is better.. not crucial
         # steps = 0
         # for key_pow, val_coor  in self.read_bits.items():
-        #     steps += self.matrix_board[val_coor] ** 2
+        #     steps += (self.matrix_board[val_coor] * 2) ** key_pow
         # return steps
 
         bit3 = self.matrix_board[self.read_bits[3]]
@@ -149,6 +153,12 @@ class Board(Base_mill):
 
     def cononical_board(self, player):
         step = self.decode_step_count()
-        self.matrix_board *= -1
+        self.matrix_board *= player  # TODO: I think it supposed to be * player so you remain consistent with the turns
         self.encode_step_count(step)
         return self.matrix_board
+
+    def get_clean_board(self):
+        board = np.copy(self.matrix_board)
+        for _, bit_coor in self.bits_map.items():
+            board[bit_coor] = 0
+        return board
