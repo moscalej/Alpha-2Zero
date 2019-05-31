@@ -135,7 +135,7 @@ class Board(Base_mill):
         bit2 = self.matrix_board[self.read_bits[2]]
         bit1 = self.matrix_board[self.read_bits[1]]
         bit0 = self.matrix_board[self.read_bits[0]]
-        return int(f'0b{bit3}{bit2}{bit1}{bit0}', 2) if np.sum(np.sum(np.abs(self.matrix_board))) > 3 else 0
+        return int(f'0b{bit3}{bit2}{bit1}{bit0}', 2)
 
     def isStage2(self):
         """
