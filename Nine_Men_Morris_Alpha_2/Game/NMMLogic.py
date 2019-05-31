@@ -1,11 +1,10 @@
-
 # from bkcharts.attributes import color
 import numpy as np
 
 from Nine_Men_Morris_Alpha_2.Game.base_board import Base_mill
 
 
-def int_to_bin_string( i):
+def int_to_bin_string(i):
     if i == 0:
         return "0"
     s = ''
@@ -21,10 +20,10 @@ def int_to_bin_string( i):
 class Board(Base_mill):
 
     # list of all 8 directions on the board, as (x,y) offsets
-    def __init__(self, matrix_board = None):
+    def __init__(self, matrix_b=None):
         super(Board, self).__init__()
-        if matrix_board is not None:
-            self.matrix_board = matrix_board
+        if matrix_b is not None:
+            self.matrix_board = matrix_b
 
     def is_mill(self, player: int, place: int) -> bool:
         ML = lambda player, board, pos1, pos2: board[pos1] == player and board[pos2] == player
@@ -91,14 +90,16 @@ class Board(Base_mill):
     def is_win(self, player):
 
         # if others player number of pieces is 2 you win
-
-        unique, counts = np.unique(self.matrix_board, return_counts=True)
-        if len(unique) > 2:  # if not it means early stages of the game, two players didn't play yet
-            opp_count = dict(zip(unique, counts))[-player]
-            if opp_count < 2:
-                return True
-            if not np.sum(self.get_legal_moves(player)):
-                return True
+        # TODO this is not ok
+        step = self.decode_step_count()
+        if step >= 14:
+            unique, counts = np.unique(self.matrix_board, return_counts=True)
+            if len(unique) > 2:  # if not it means early stages of the game, two players didn't play yet
+                opp_count = dict(zip(unique, counts))[-player]
+                if opp_count < 2:
+                    return True
+                if not np.sum(self.get_legal_moves(player)):
+                    return True
         return False
 
     def encode_next(self):
@@ -110,13 +111,13 @@ class Board(Base_mill):
         steps = self.decode_step_count()
         if steps >= 17 - 4:
             return
-
-        if steps == 0 and np.sum(np.sum(np.abs(self.board))) <= 4:
+        debug = np.sum(np.sum(np.abs(self.matrix_board)))
+        if steps == 0 and debug <= 4:
             return
 
         self.encode_step_count(steps + 1)
 
-    def encode_step_count(self,steps):
+    def encode_step_count(self, steps):
         bin_str = int_to_bin_string(steps)
         for ind, val in enumerate(bin_str[::-1]):
             self.matrix_board[self.bits_map[ind]] = val
