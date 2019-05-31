@@ -7,7 +7,6 @@ import numpy as np
 from Nine_Men_Morris_Alpha_2.Game.base_board import Base_mill
 
 
-
 def int_to_bin_string(self, i):
     if i == 0:
         return "0"
@@ -21,12 +20,12 @@ def int_to_bin_string(self, i):
     return s
 
 
-
 class Board(Base_mill):
 
     # list of all 8 directions on the board, as (x,y) offsets
-    def __init__(self):
+    def __init__(self, matrix_board):
         super(Board, self).__init__()
+        self.matrix_board = matrix_board
         self.move_count = 0
 
     def is_stage_2(self):
@@ -48,7 +47,7 @@ class Board(Base_mill):
             # self.board[remove_opponent] = 0
         self.move_count += 1
 
-        self.matrix_board = self.encode_next(self.matrix_board)
+        self.encode_next()
 
     def get_legal_moves(self, player: int, stage2: bool) -> np.ndarray:
         """
@@ -108,7 +107,6 @@ class Board(Base_mill):
                 return True
         return False
 
-
     def encode_next(self):
         """
         updates board to have count + 1
@@ -116,10 +114,10 @@ class Board(Base_mill):
         :return: None
         """
         steps = self.decode_step_count() + 1
+
         bin_str = int_to_bin_string(steps)
         for ind, val in enumerate(bin_str[::-1]):
             self.matrix_board[self.bits_map[ind]] = val
-
 
     def decode_step_count(self):
         """
@@ -127,11 +125,17 @@ class Board(Base_mill):
         count is shifted  steps 0,1,2,3 => 0, and then 4=>1, 5=>2, ect..
         :return: int number of steps
         """
-        steps = 0
-        for coor, pow in self.read_bits.items():
-            steps += self.matrix_board[coor] ** 2
-        return steps
+        # TODO remove this after talk, problem this only returns a even number from [0,2,4,6,8]
+        # steps = 0
+        # for key_pow, val_coor  in self.read_bits.items():
+        #     steps += self.matrix_board[val_coor] ** 2
+        # return steps
 
+        bit3 = self.matrix_board[self.read_bits[3]]
+        bit2 = self.matrix_board[self.read_bits[2]]
+        bit1 = self.matrix_board[self.read_bits[1]]
+        bit0 = self.matrix_board[self.read_bits[0]]
+        return int(f'0b{bit3}{bit2}{bit1}{bit0}', 2) if np.sum(np.sum(np.abs(self.matrix_board))) > 3 else 0
 
     def isStage2(self):
         """
@@ -139,4 +143,3 @@ class Board(Base_mill):
         :return: bool answering "is stage 2?"
         """
         return (self.decode_step_count() > 17 - 3)  # stage 2 from 18th step count is shifted
-

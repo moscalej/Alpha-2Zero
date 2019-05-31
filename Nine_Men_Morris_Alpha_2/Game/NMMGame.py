@@ -30,37 +30,37 @@ class MenMorris(Game):
 
         if action == (self.actionSize - 1):  #?? TODO validate probably end of game
             return (board, -player)
-        b = NMMLogic.Board()
-        b.matrix_board = np.copy(board)
+        b = NMMLogic.Board(board)
         b.decode_action(player, action)
         # board = np.copy(b.matrix_board)
         return (b.matrix_board, -player)
 
-    def getValidMoves(self, board, player, stage2):
+    def getValidMoves(self, board, player):
         # return a fixed size binary vector
         b = NMMLogic.Board()
         b.matrix_board = np.copy(board)
         b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys()))+1)]
-        legalMoves = b.get_legal_moves(player, stage2)
+        legalMoves = b.get_legal_moves(player)
         legalMoves = list(legalMoves.reshape(-1))
         legalMoves.extend([0 if np.sum(legalMoves) > 0 else 1])
         return legalMoves
 
-    def getGameEnded(self, board, player, stage2):
+    def getGameEnded(self, board, player):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
         b = NMMLogic.Board()
         b.matrix_board = np.copy(board)
 
-        if b.is_win(player, stage2):
+        if b.is_win(player):
             return player
-        if b.is_win(-player, stage2):
+        if b.is_win(-player):
             return -player
-        valid_moves = self.getValidMoves(board, player, stage2)
+        valid_moves = self.getValidMoves(board, player)
         if np.sum(valid_moves):  # game continues
             return 0
         # draw has a very little value
         return 1e-4 * player
+
 
     def getCanonicalForm(self, board, player):
         # return state if player==1, else return -state if player==-1
