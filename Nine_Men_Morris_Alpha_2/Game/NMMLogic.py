@@ -113,9 +113,14 @@ class Board(Base_mill):
         count is shifted  steps 0,1,2,3 => 0, and then 4=>1, 5=>2, ect..
         :return: None
         """
-        steps = self.decode_step_count() + 1
+        steps = self.decode_step_count()
+        if steps >= 17 - 4:
+            return
 
-        bin_str = int_to_bin_string(steps)
+        if steps == 0 and np.sum(np.sum(np.abs(self.board))) <= 4:
+            return
+
+        bin_str = int_to_bin_string(steps + 1)
         for ind, val in enumerate(bin_str[::-1]):
             self.matrix_board[self.bits_map[ind]] = val
 
