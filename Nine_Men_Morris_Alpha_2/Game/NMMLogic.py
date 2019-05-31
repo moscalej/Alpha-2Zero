@@ -7,6 +7,21 @@ import numpy as np
 from Nine_Men_Morris_Alpha_2.Game.base_board import Base_mill
 
 
+
+def int_to_bin_string(self, i):
+    if i == 0:
+        return "0"
+    s = ''
+    while i:
+        if i & 1 == 1:
+            s = "1" + s
+        else:
+            s = "0" + s
+        i //= 2
+    return s
+
+
+
 class Board(Base_mill):
 
     # list of all 8 directions on the board, as (x,y) offsets
@@ -101,7 +116,7 @@ class Board(Base_mill):
         :return: None
         """
         steps = self.decode_step_count() + 1
-        bin_str = self.int_to_bin_string(steps)
+        bin_str = int_to_bin_string(steps)
         for ind, val in enumerate(bin_str[::-1]):
             self.matrix_board[self.bits_map[ind]] = val
 

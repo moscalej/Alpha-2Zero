@@ -4,6 +4,8 @@ import numpy as np
 from alpha_zero_general.Game import Game
 from Nine_Men_Morris_Alpha_2.Game import NMMLogic
 
+
+
 class MenMorris(Game):
     def __init__(self, men_count):
         self.men_count = men_count
