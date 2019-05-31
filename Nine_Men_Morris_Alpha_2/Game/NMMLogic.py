@@ -21,9 +21,10 @@ def int_to_bin_string( i):
 class Board(Base_mill):
 
     # list of all 8 directions on the board, as (x,y) offsets
-    def __init__(self, matrix_board):
+    def __init__(self, matrix_board = None):
         super(Board, self).__init__()
-        self.matrix_board = matrix_board
+        if matrix_board is not None:
+            self.matrix_board = matrix_board
 
     def is_mill(self, player: int, place: int) -> bool:
         ML = lambda player, board, pos1, pos2: board[pos1] == player and board[pos2] == player

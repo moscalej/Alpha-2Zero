@@ -2,23 +2,24 @@ from __future__ import print_function
 
 import numpy as np
 from alpha_zero_general.Game import Game
-from Nine_Men_Morris_Alpha_2.Game import NMMLogic
+from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board
 
 
 
 class MenMorris(Game):
     def __init__(self, men_count):
+        super(MenMorris, self).__init__()
         self.men_count = men_count
         self.actionSize = 24 * 5 * 25 + 1
 
     def getInitBoard(self):
         # return initial board (numpy board)
-        b = NMMLogic.Board()
+        b = Board()
         return b.matrix_board
 
     def getBoardSize(self):
         # (a,b) tuple
-        return (7, 7)
+        return 7, 7
 
     def getActionSize(self):
         # return number of actions
@@ -30,15 +31,15 @@ class MenMorris(Game):
 
         if action == (self.actionSize - 1):  #?? TODO validate probably end of game
             return (board, -player)
-        b = NMMLogic.Board(board)
+        b = Board(board)
         b.decode_action(player, action)
         # board = np.copy(b.matrix_board)
-        return (b.matrix_board, -player)
+        return b.matrix_board, -player
 
     def getValidMoves(self, board, player):
         # return a fixed size binary vector
-        b = NMMLogic.Board()
-        b.matrix_board = np.copy(board)
+        b = Board(board)
+        #Todo check what is this
         b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys()))+1)]
         legalMoves = b.get_legal_moves(player)
         legalMoves = list(legalMoves.reshape(-1))
@@ -48,7 +49,7 @@ class MenMorris(Game):
     def getGameEnded(self, board, player):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
-        b = NMMLogic.Board()
+        b = Board()
         b.matrix_board = np.copy(board)
 
         if b.is_win(player):
@@ -64,6 +65,7 @@ class MenMorris(Game):
 
     def getCanonicalForm(self, board, player):
         # return state if player==1, else return -state if player==-1
+        # TODO need to check this
         return player*board
 
     def getSymmetries(self, board, pi):
