@@ -114,7 +114,10 @@ class Board(Base_mill):
         if steps == 0 and np.sum(np.sum(np.abs(self.board))) <= 4:
             return
 
-        bin_str = int_to_bin_string(steps + 1)
+        self.encode_step_count(steps + 1)
+
+    def encode_step_count(self,steps):
+        bin_str = int_to_bin_string(steps)
         for ind, val in enumerate(bin_str[::-1]):
             self.matrix_board[self.bits_map[ind]] = val
 
@@ -142,3 +145,9 @@ class Board(Base_mill):
         :return: bool answering "is stage 2?"
         """
         return self.decode_step_count() > 17 - 3  # stage 2 from 18th step count is shifted
+
+    def cononical_board(self, player):
+        step = self.decode_step_count()
+        self.matrix_board *= -1
+        self.encode_step_count(step)
+        return self.matrix_board

@@ -5,7 +5,6 @@ from alpha_zero_general.Game import Game
 from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board
 
 
-
 class MenMorris(Game):
     def __init__(self, men_count):
         super(MenMorris, self).__init__()
@@ -29,7 +28,7 @@ class MenMorris(Game):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
 
-        if action == (self.actionSize - 1):  #?? TODO validate probably end of game
+        if action == (self.actionSize - 1):  # ?? TODO validate probably end of game
             return (board, -player)
         b = Board(board)
         b.decode_action(player, action)
@@ -39,8 +38,8 @@ class MenMorris(Game):
     def getValidMoves(self, board, player):
         # return a fixed size binary vector
         b = Board(board)
-        #Todo check what is this
-        b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys()))+1)]
+        # Todo check what is this
+        b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys())) + 1)]
         legalMoves = b.get_legal_moves(player)
         legalMoves = list(legalMoves.reshape(-1))
         legalMoves.extend([0 if np.sum(legalMoves) > 0 else 1])
@@ -49,8 +48,7 @@ class MenMorris(Game):
     def getGameEnded(self, board, player):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
-        b = Board()
-        b.matrix_board = np.copy(board)
+        b = Board(board)
 
         if b.is_win(player):
             return player
@@ -62,11 +60,11 @@ class MenMorris(Game):
         # draw has a very little value
         return 1e-4 * player
 
-
     def getCanonicalForm(self, board, player):
         # return state if player==1, else return -state if player==-1
         # TODO need to check this
-        return player*board
+        b = Board(board)
+        return b.cononical_board(player)
 
     def getSymmetries(self, board, pi):
         # mirror, rotational
@@ -80,7 +78,7 @@ class MenMorris(Game):
                 newPi = np.rot90(pi_board, i)  # TODO check if this rotation is correct
                 if j:
                     newB = np.fliplr(newB)
-                    newPi = np.fliplr(newPi) # TODO check if this flip is correct
+                    newPi = np.fliplr(newPi)  # TODO check if this flip is correct
                 l += [(newB, list(newPi.ravel()) + [pi[-1]])]
         return l
 
@@ -88,30 +86,33 @@ class MenMorris(Game):
         # 8x8 numpy array (canonical board)
         return board.tostring()
 
+
 def display(board):
     n = board.shape[0]
     print("   ", end="")
     for y in range(n):
-        print (y,"", end="")
+        print(y, "", end="")
     print("")
     print("  ", end="")
     for _ in range(n):
-        print ("-", end="-")
+        print("-", end="-")
     print("--")
     for y in range(n):
-        print(y, "|",end="")    # print the row #
+        print(y, "|", end="")  # print the row #
         for x in range(n):
-            piece = board[y][x]    # get the piece to print
-            if piece == -1: print("X ",end="")
-            elif piece == 1: print("O ",end="")
+            piece = board[y][x]  # get the piece to print
+            if piece == -1:
+                print("X ", end="")
+            elif piece == 1:
+                print("O ", end="")
             else:
-                if x==n:
-                    print("-",end="")
+                if x == n:
+                    print("-", end="")
                 else:
-                    print("- ",end="")
+                    print("- ", end="")
         print("|")
 
     print("  ", end="")
     for _ in range(n):
-        print ("-", end="-")
+        print("-", end="-")
     print("--")
