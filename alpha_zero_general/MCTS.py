@@ -114,7 +114,16 @@ class MCTS():
                     best_act = a
 
         a = best_act
+        # <debug>
+        b = self.game.get_board_obj(canonicalBoard)
+        print(f"Player1 step {b.decode_step_count()}:")
+        b.verbal_action_decode(a)
+        print(f"Board before: \n{b.get_clean_board(canonicalBoard)}")
+        # <\debug>
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
+        # <debug>
+        print(f"Board after: \n{self.game.get_board_obj(None).get_clean_board(next_s)}")
+        # <\debug>
         next_s = self.game.getCanonicalForm(next_s, next_player)
 
         v = self.search(next_s)

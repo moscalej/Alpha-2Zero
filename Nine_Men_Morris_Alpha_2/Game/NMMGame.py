@@ -38,7 +38,6 @@ class MenMorris(Game):
     def getValidMoves(self, board, player):
         # return a fixed size binary vector
         b = Board(board)
-        # Todo check what is this
         b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys())) + 1)]
         legalMoves = b.get_legal_moves(player)
         legalMoves = list(legalMoves.reshape(-1))
@@ -49,7 +48,7 @@ class MenMorris(Game):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
         b = Board(board)
-
+        b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys())) + 1)]
         if b.is_win(player):
             return player
         if b.is_win(-player):
@@ -86,6 +85,8 @@ class MenMorris(Game):
         # 8x8 numpy array (canonical board)
         return board.tostring()
 
+    def get_board_obj(self, board):
+        return Board(board)
 
 def display(board):
     n = board.shape[0]
