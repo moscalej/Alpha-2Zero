@@ -30,24 +30,24 @@ class MenMorris(Game):
 
         if action == (self.actionSize - 1):  # ?? TODO validate probably end of game
             return (board, -player)
-        b = Board(board)
+        b = Board(board.copy())
         b.decode_action(player, action)
         # board = np.copy(b.matrix_board)
         return b.matrix_board, -player
 
-    def getValidMoves(self, board, player):
+    def getValidMoves(self, board: np.ndarray, player):
         # return a fixed size binary vector
-        b = Board(board)
+        b = Board(board.copy())
         b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys())) + 1)]
         legalMoves = b.get_legal_moves(player)
         legalMoves = list(legalMoves.reshape(-1))
         legalMoves.extend([0 if np.sum(legalMoves) > 0 else 1])
         return legalMoves
 
-    def getGameEnded(self, board, player):
+    def getGameEnded(self, board: np.ndarray, player):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
-        b = Board(board)
+        b = Board(board.copy())
         b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys())) + 1)]
         if b.is_win(player):
             return player
@@ -59,18 +59,18 @@ class MenMorris(Game):
         # draw has a very little value
         return 1e-4 * player
 
-    def getCanonicalForm(self, board, player):
+    def getCanonicalForm(self, board: np.ndarray, player):
         # return state if player==1, else return -state if player==-1
         # TODO need to check this
-        b = Board(board)
+        b = Board(board.copy())
         return b.cononical_board(player)
 
-    def getSymmetries(self, board, pi):
+    def getSymmetries(self, board: np.ndarray, pi):
         # mirror, rotational
         # assert(len(pi) == self.n**2+1)  # 1 for pass
         pi_board = np.reshape(pi[:-1], (24, 5, 25))
         l = []
-
+        board = board.copy()
         for i in range(1, 5):
             for j in [True, False]:
                 newB = np.rot90(board, i)
@@ -87,6 +87,7 @@ class MenMorris(Game):
 
     def get_board_obj(self, board):
         return Board(board)
+
 
 def display(board):
     n = board.shape[0]

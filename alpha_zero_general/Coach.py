@@ -8,7 +8,7 @@ from pickle import Pickler, Unpickler
 from random import shuffle
 
 
-class Coach():
+class Coach:
     """
     This class executes the self-play + learning. It uses the functions defined
     in Game and NeuralNet. args are specified in main.py.
