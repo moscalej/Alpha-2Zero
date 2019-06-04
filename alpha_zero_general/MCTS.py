@@ -46,7 +46,7 @@ class MCTS():
         probs = [x / float(sum(counts)) for x in counts]
         return probs
 
-    def search(self, canonicalBoard, verbose=False):
+    def search(self, canonicalBoard, verbose=True):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
@@ -85,7 +85,6 @@ class MCTS():
                 self.Ps[s] /= sum_Ps_s  # renormalize
             else:
                 # if all valid moves were masked make all valid moves equally probable
-
                 # NB! All valid moves may be masked if either your NNet architecture is insufficient or you've get overfitting or something else.
                 # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.   
                 print("All valid moves were masked, do workaround.")
@@ -114,24 +113,20 @@ class MCTS():
                     best_act = a
 
         a = best_act
+
         # <debug>
-        b = self.game.get_board_obj(canonicalBoard)
         if verbose:
+            b = self.game.get_board_obj(canonicalBoard)
             print(f"Player1 step {b.decode_step_count()}:")
-            b.verbal_action_decode(a)
-        if verbose:
-            print(f"Board before: \n{b.print_board(canonicalBoard)}")
+            b.print_board(canonicalBoard, a)
         # <\debug>
+
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
-        # <debug>
-        if verbose:
-            print(f"Board after: \n{self.game.get_board_obj(None).print_board(next_s)}")
-        # <\debug>
         next_s = self.game.getCanonicalForm(next_s, next_player)
         try:
             v = self.search(next_s)
         except RecursionError:
-            return 0
+            return 1e-4 * next_player  # so we don't favor any of the players
 
         if (s, a) in self.Qsa:  # if (s,a) exists, update, otherwise, set
             self.Qsa[(s, a)] = (self.Nsa[(s, a)] * self.Qsa[(s, a)] + v) / (self.Nsa[(s, a)] + 1)

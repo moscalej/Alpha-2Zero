@@ -2,6 +2,7 @@
 import numpy as np
 
 from Nine_Men_Morris_Alpha_2.Game.base_board import Base_mill
+from termcolor import colored
 
 
 def int_to_bin_string(i):
@@ -61,7 +62,7 @@ class Board(Base_mill):
                 if self.is_mill(player, pos, self.board):  # current selection completes a mill
                     opp_pos = np.where(self.board == -player)[0]
                     opp_pos = [opp_p for opp_p in opp_pos if
-                               not self.is_mill(-player, opp_p,self.board)]  # can't remove opponent in mill
+                               not self.is_mill(-player, opp_p, self.board)]  # can't remove opponent in mill
                     action_mask[pos, -1, opp_pos] = True
                 else:
                     action_mask[pos, -1, -1] = True  # place piece on board
@@ -75,7 +76,7 @@ class Board(Base_mill):
                 for (orient, adj) in mill_cands:
                     if self.is_mill(player, adj, if_played_board):
                         opp_pos = np.where(array_board == -player)[0]
-                        opp_pos = [opp_p for opp_p in opp_pos if not self.is_mill(-player, opp_p,if_played_board)]
+                        opp_pos = [opp_p for opp_p in opp_pos if not self.is_mill(-player, opp_p, if_played_board)]
                         action_mask[from_pos, orient, opp_pos] = True
                     else:
                         action_mask[from_pos, orient, -1] = True
@@ -171,17 +172,79 @@ class Board(Base_mill):
             return
         action_types = ['up', 'down', 'left', 'right']
         piece, action, remove = np.unravel_index(action_code, (24, 5, 25))
+        describe_moves = []
         if action == 4:
-            print(f"Set a piece in {self.board_map[piece]}")
+            describe_moves.append(f"Set a piece in {self.board_map[piece]}")
         else:
-            print(f"Move from {self.board_map[piece]} {action_types[action]} to {self.board_map[self.adjacent[piece][action]]}")
+            describe_moves.append(f"Move from {self.board_map[piece]} {action_types[action]}"
+                                  f" to {self.board_map[self.adjacent[piece][action]]}")
 
         if remove != 24:
-            print(f"and Remove from {self.board_map[remove]}")
+            describe_moves.append(f"and Remove from {self.board_map[remove]}")
 
-    def print_board(self, board):
-        board = self.get_clean_board(board)
-        n = board.shape[0]
+    def print_board(self, board, action_code=None):
+        # if action_code == 24 * 5 * 25:
+        #     print(f"game ended action code: {action_code}")
+        #     return
+        # action_types = ['up', 'down', 'left', 'right']
+        piece, action, remove = np.unravel_index(action_code, (24, 5, 25))
+        #
+        withAction = action_code is not None
+        set = []
+        removed = []
+        if withAction:
+            if action_code == 24 * 5 * 25:
+                print(f"game ended action code: {action_code}")
+                return
+            piece, action, remove = np.unravel_index(action_code, (24, 5, 25))
+            action_types = ['up', 'down', 'left', 'right']
+
+            describe_moves = []
+
+            if action == 4:
+                describe_moves.append(f"Set a piece in {self.board_map[piece]}")
+                set.append(self.board_map[piece])
+
+            else:
+                removed.append(self.board_map[piece])
+                set.append(self.board_map[self.adjacent[piece][action]])
+                describe_moves.append(f"Move from {self.board_map[piece]} {action_types[action]}"
+                                      f" to {self.board_map[self.adjacent[piece][action]]}")
+
+            if remove != 24:
+                removed.append(self.board_map[remove])
+                describe_moves.append(f"and Remove from {self.board_map[remove]}")
+            print('\n'.join(describe_moves))
+            b = Board(np.copy(board))
+            b.decode_action(1, action_code)
+            next_board = b.matrix_board
+            print('legend:', colored('removed', 'red'), colored('Placed', 'yellow'), colored('Player 1', 'blue'),
+                  colored('Player 2', 'magenta'))
+        else:
+            next_board = board
+
+        def getColor(x_, y_, player):
+            if player == 1:
+                s = 'X'
+                color = 'blue'
+            elif player == -1:
+                s = 'O'
+                color = 'magenta'
+            else:
+                color = 'white'
+                s = '-'
+            if (x_, y_) in set:
+                s = 'X'
+                color = 'yellow'
+            if (x_, y) in removed:
+                s = '-'
+                color = 'red'
+            return color, s
+
+
+
+        next_board = self.get_clean_board(next_board)
+        n = next_board.shape[0]
         print("   ", end="")
         for y in range(n):
             print(y, "", end="")
@@ -193,16 +256,17 @@ class Board(Base_mill):
         for y in range(n):
             print(y, "|", end="")  # print the row #
             for x in range(n):
-                piece = board[y][x]  # get the piece to print
+                piece = next_board[y][x]  # get the piece to print
+                color, s = getColor(x, y, piece)
                 if piece == -1:
-                    print("X ", end="")
+                    print(colored(f"{s} ", color), end="")
                 elif piece == 1:
-                    print("O ", end="")
+                    print(colored(f"{s} ", color), end="")
                 else:
                     if x == n:
-                        print("-", end="")
+                        print(colored(f"{s}", color), end="")
                     else:
-                        print("- ", end="")
+                        print(colored(f"{s} ", color), end="")
             print("|")
 
         print("  ", end="")
