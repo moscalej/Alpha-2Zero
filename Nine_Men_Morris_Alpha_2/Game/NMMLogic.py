@@ -25,10 +25,10 @@ class Board(Base_mill):
         if matrix_b is not None:
             self.matrix_board = matrix_b
 
-    def is_mill(self, player: int, place: int) -> bool:
+    def is_mill(self, player: int, place: int, board_: list) -> bool:
         ML = lambda player, board, pos1, pos2: board[pos1] == player and board[pos2] == player
         is_mill_or = lambda player, board, cm: ML(player, board, cm[0], cm[1]) or ML(player, board, cm[2], cm[3])
-        return is_mill_or(player, self.board, self.complete_mill[place])
+        return is_mill_or(player, board_, self.complete_mill[place])
 
     def execute_move(self, player: int, remove: int, set_place: int, remove_opponent: int):
         if remove != 24:  # moving a piece on the board
@@ -54,26 +54,28 @@ class Board(Base_mill):
         stage2 = self.is_stage2()
         action_mask = np.zeros((24, 5, 25), dtype=bool)
         # if stage 1 add set options
+        array_board = np.array(self.board)
         if not stage2:
-            legal_pos = np.where(np.array(self.board) == 0)[0]
+            legal_pos = np.where(array_board == 0)[0]
             for pos in legal_pos:
-                if self.is_mill(player, pos):  # current selection completes a mill
+                if self.is_mill(player, pos, self.board):  # current selection completes a mill
                     opp_pos = np.where(self.board == -player)[0]
-                    opp_pos = [opp_p for opp_p in opp_pos if not self.is_mill(-player, opp_p)]  # can't remove opponent in mill
+                    opp_pos = [opp_p for opp_p in opp_pos if
+                               not self.is_mill(-player, opp_p,self.board)]  # can't remove opponent in mill
                     action_mask[pos, -1, opp_pos] = True
                 else:
                     action_mask[pos, -1, -1] = True  # place piece on board
         else:
-            from_pos_cands = np.where(self.board == player)[0]
+            from_pos_cands = np.where(array_board == player)[0]
             for from_pos in from_pos_cands:
                 mill_cands = [(orient, adj) for orient, adj in enumerate(self.adjacent[from_pos]) if
                               adj is not None and self.board[adj] == 0]  # TODO added not, need to validate
                 if_played_board = self.board.copy()
                 if_played_board[from_pos] = 0
                 for (orient, adj) in mill_cands:
-                    if self.is_mill(player, adj):
-                        opp_pos = np.where(self.board == -player)[0]
-                        opp_pos = [opp_p for opp_p in opp_pos if not self.is_mill(-player, opp_p)]
+                    if self.is_mill(player, adj, if_played_board):
+                        opp_pos = np.where(array_board == -player)[0]
+                        opp_pos = [opp_p for opp_p in opp_pos if not self.is_mill(-player, opp_p,if_played_board)]
                         action_mask[from_pos, orient, opp_pos] = True
                     else:
                         action_mask[from_pos, orient, -1] = True
@@ -85,7 +87,7 @@ class Board(Base_mill):
         if action == 4:  #
             self.execute_move(player, remove=24, set_place=piece, remove_opponent=remove)
         else:
-            self.execute_move(player, remove=piece, set_place=self.adjacent[action], remove_opponent=remove)
+            self.execute_move(player, remove=piece, set_place=self.adjacent[piece][action], remove_opponent=remove)
 
     def is_win(self, player):
         """  TODO: make sure that this is used in the end of player turn, and evaluated with the new board for the player that played
@@ -100,7 +102,7 @@ class Board(Base_mill):
         board = self.get_clean_board(self.matrix_board)
         unique, counts = np.unique(board, return_counts=True)
         opp_count = dict(zip(unique, counts))[-player]
-        if opp_count < 2:
+        if opp_count <= 2:
             return True
         if not np.sum(self.get_legal_moves(-player)):
             return True
@@ -120,7 +122,6 @@ class Board(Base_mill):
             if debug < 4:
                 return
         self.encode_step_count(steps + 1)
-
 
     def encode_step_count(self, steps):
         bin_str = int_to_bin_string(steps)
@@ -165,7 +166,7 @@ class Board(Base_mill):
         return board
 
     def verbal_action_decode(self, action_code):
-        if action_code == 24*5*25:
+        if action_code == 24 * 5 * 25:
             print(f"game ended action code: {action_code}")
             return
         action_types = ['up', 'down', 'left', 'right']
@@ -178,5 +179,33 @@ class Board(Base_mill):
         if remove != 24:
             print(f"and Remove from {self.board_map[remove]}")
 
+    def print_board(self, board):
+        board = self.get_clean_board(board)
+        n = board.shape[0]
+        print("   ", end="")
+        for y in range(n):
+            print(y, "", end="")
+        print("")
+        print("  ", end="")
+        for _ in range(n):
+            print("-", end="-")
+        print("--")
+        for y in range(n):
+            print(y, "|", end="")  # print the row #
+            for x in range(n):
+                piece = board[y][x]  # get the piece to print
+                if piece == -1:
+                    print("X ", end="")
+                elif piece == 1:
+                    print("O ", end="")
+                else:
+                    if x == n:
+                        print("-", end="")
+                    else:
+                        print("- ", end="")
+            print("|")
 
-
+        print("  ", end="")
+        for _ in range(n):
+            print("-", end="-")
+        print("--")

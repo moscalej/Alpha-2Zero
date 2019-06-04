@@ -118,18 +118,20 @@ class MCTS():
         b = self.game.get_board_obj(canonicalBoard)
         if verbose:
             print(f"Player1 step {b.decode_step_count()}:")
-        b.verbal_action_decode(a)
+            b.verbal_action_decode(a)
         if verbose:
-            print(f"Board before: \n{b.get_clean_board(canonicalBoard)}")
+            print(f"Board before: \n{b.print_board(canonicalBoard)}")
         # <\debug>
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)
         # <debug>
         if verbose:
-            print(f"Board after: \n{self.game.get_board_obj(None).get_clean_board(next_s)}")
+            print(f"Board after: \n{self.game.get_board_obj(None).print_board(next_s)}")
         # <\debug>
         next_s = self.game.getCanonicalForm(next_s, next_player)
-
-        v = self.search(next_s)
+        try:
+            v = self.search(next_s)
+        except RecursionError:
+            return 0
 
         if (s, a) in self.Qsa:  # if (s,a) exists, update, otherwise, set
             self.Qsa[(s, a)] = (self.Nsa[(s, a)] * self.Qsa[(s, a)] + v) / (self.Nsa[(s, a)] + 1)
