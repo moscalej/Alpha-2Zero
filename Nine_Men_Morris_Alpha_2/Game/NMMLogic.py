@@ -183,15 +183,10 @@ class Board(Base_mill):
             describe_moves.append(f"and Remove from {self.board_map[remove]}")
 
     def print_board(self, board, action_code=None):
-        # if action_code == 24 * 5 * 25:
-        #     print(f"game ended action code: {action_code}")
-        #     return
-        # action_types = ['up', 'down', 'left', 'right']
-        piece, action, remove = np.unravel_index(action_code, (24, 5, 25))
-        #
         withAction = action_code is not None
         set = []
         removed = []
+        legal_inds = list(self.board_map.values())
         if withAction:
             if action_code == 24 * 5 * 25:
                 print(f"game ended action code: {action_code}")
@@ -224,6 +219,8 @@ class Board(Base_mill):
             next_board = board
 
         def getColor(x_, y_, player):
+            if (x_, y_) not in legal_inds:
+                return 'blue', ' '
             if player == 1:
                 s = 'X'
                 color = 'blue'
