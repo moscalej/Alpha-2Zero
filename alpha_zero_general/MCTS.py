@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from scipy.special import softmax
 
 EPS = 1e-8
 
@@ -36,17 +37,20 @@ class MCTS():
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
 
-        if temp == 0:
+        if True:
             bestA = np.argmax(counts)
             probs = [0] * len(counts)
             probs[bestA] = 1
             return probs
 
+        # counts = [x ** (1. / temp) for x in counts]
         counts = [x ** (1. / temp) for x in counts]
-        probs = [x / float(sum(counts)) for x in counts]
+        # probs = [x / float(sum(counts)) for x in counts]
+        probs = softmax(counts) * np.array(counts) != 0
+        probs = probs / sum(probs)
         return probs
 
-    def search(self, canonicalBoard, verbose=True):
+    def search(self, canonicalBoard, verbose=False):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
@@ -74,13 +78,15 @@ class MCTS():
             # terminal node
             return -self.Es[s]
 
-        if s not in self.Ps:
+        if s not in self.Ps:  # policy state
 
             # leaf node
             self.Ps[s], v = self.nnet.predict(canonicalBoard)
+            t = max(self.Ps[s])
             valids = self.game.getValidMoves(canonicalBoard, 1)
             self.Ps[s] = self.Ps[s] * valids  # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
+
             if sum_Ps_s > 0:
                 self.Ps[s] /= sum_Ps_s  # renormalize
             else:
@@ -103,6 +109,7 @@ class MCTS():
         for a in range(self.game.getActionSize()):
             if valids[a]:
                 if (s, a) in self.Qsa:
+                    # This provides some exploration if Nsa is small then u will be bigger --> explore less
                     u = self.Qsa[(s, a)] + self.args.cpuct * self.Ps[s][a] * math.sqrt(self.Ns[s]) / (
                                 1 + self.Nsa[(s, a)])
                 else:
@@ -125,8 +132,13 @@ class MCTS():
         next_s = self.game.getCanonicalForm(next_s, next_player)
         try:
             v = self.search(next_s)
+
         except RecursionError:
-            return 1e-4 * next_player  # so we don't favor any of the players
+            print("recursion")
+            t =np.array(self.Ps[s])
+            print(f"np.sum(self.Ps[s]){np.sum(t != 0)}")
+            print(f'Values are : {t[t!=0]}')
+            return - 1e-4   # so we don't favor any of the players
 
         if (s, a) in self.Qsa:  # if (s,a) exists, update, otherwise, set
             self.Qsa[(s, a)] = (self.Nsa[(s, a)] * self.Qsa[(s, a)] + v) / (self.Nsa[(s, a)] + 1)

@@ -103,10 +103,10 @@ class Board(Base_mill):
         board = self.get_clean_board(self.matrix_board)
         unique, counts = np.unique(board, return_counts=True)
         opp_count = dict(zip(unique, counts))[-player]
-        if opp_count <= 2:
+        if opp_count <= 2 or not np.sum(self.get_legal_moves(-player)):
+            print(f"player {player} wins")
             return True
-        if not np.sum(self.get_legal_moves(-player)):
-            return True
+
         return False
 
     def encode_next(self):

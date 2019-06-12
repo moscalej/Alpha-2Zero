@@ -97,7 +97,7 @@ class Arena():
                                                                                                        total=bar.elapsed_td,
                                                                                                        eta=bar.eta_td)
             bar.next()
-
+        print(f'player {1} state--> won: {oneWon} loss: {twoWon}')
         self.player1, self.player2 = self.player2, self.player1
 
         for _ in range(num):

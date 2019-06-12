@@ -49,10 +49,10 @@ class MenMorris(Game):
         # player = 1
         b = Board(board.copy())
         b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys())) + 1)]
-        if b.is_win(player):
-            return player
         if b.is_win(-player):
             return -player
+        if b.is_win(player):
+            return player
         valid_moves = self.getValidMoves(board, player)
         if np.sum(valid_moves):  # game continues
             return 0
@@ -68,17 +68,18 @@ class MenMorris(Game):
     def getSymmetries(self, board: np.ndarray, pi):
         # mirror, rotational
         # assert(len(pi) == self.n**2+1)  # 1 for pass
-        pi_board = np.reshape(pi[:-1], (24, 5, 25))
-        l = []
-        board = board.copy()
-        for i in range(1, 5):
-            for j in [True, False]:
-                newB = np.rot90(board, i)
-                newPi = np.rot90(pi_board, i)  # TODO check if this rotation is correct
-                if j:
-                    newB = np.fliplr(newB)
-                    newPi = np.fliplr(newPi)  # TODO check if this flip is correct
-                l += [(newB, list(newPi.ravel()) + [pi[-1]])]
+        # pi_board = np.reshape(pi[:-1], (24, 5, 25))
+        # l = []
+        # board = board.copy()
+        # for i in range(1, 5):
+        #     for j in [True, False]:
+        #         newB = np.rot90(board, i)
+        #         newPi = np.rot90(pi_board, i)  # TODO check if this rotation is correct
+        #         if j:
+        #             newB = np.fliplr(newB)
+        #             newPi = np.fliplr(newPi)  # TODO check if this flip is correct
+        #         l += [(newB, list(newPi.ravel()) + [pi[-1]])]
+        l = [(board, pi)]
         return l
 
     def stringRepresentation(self, board):
