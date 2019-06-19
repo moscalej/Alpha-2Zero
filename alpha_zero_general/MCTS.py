@@ -38,20 +38,21 @@ class MCTS():
         s = self.game.stringRepresentation(canonicalBoard)
         counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
 
-        if True:
+        if False:
             bestA = np.argmax(counts)
             probs = [0] * len(counts)
             probs[bestA] = 1
             return probs
 
         # counts = [x ** (1. / temp) for x in counts]
-        counts = [x ** (1. / temp) for x in counts]
+        # counts = [x ** (1. / temp) for x in counts]
         # probs = [x / float(sum(counts)) for x in counts]
-        probs = softmax(counts) * np.array(counts) != 0
-        probs = probs / sum(probs)
+        # probs = softmax(counts) * np.array(counts) != 0
+        counts = np.array(counts)
+        probs = counts / sum(counts)
         return probs
 
-    def search(self, canonicalBoard, verbose=True):
+    def search(self, canonicalBoard, verbose=False):
         """
         This function performs one iteration of MCTS. It is recursively called
         till a leaf node is found. The action chosen at each node is one that
@@ -139,6 +140,7 @@ class MCTS():
             t = np.array(self.Ps[s])
             print(f"np.sum(self.Ps[s]){np.sum(t != 0)}")
             print(f'Values are : {t[t!=0]}')
+            self.Es[s] != 1e-4
             return 0
 
         if (s, a) in self.Qsa:  # if (s,a) exists, update, otherwise, set
