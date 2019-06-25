@@ -104,7 +104,7 @@ class Board(Base_mill):
         unique, counts = np.unique(board, return_counts=True)
         opp_count = dict(zip(unique, counts))[-player]
         if opp_count <= 2 or not np.sum(self.get_legal_moves(-player)):
-            print(f"player {player} wins")
+            # print(f"player {player} wins")
             return True
 
         return False

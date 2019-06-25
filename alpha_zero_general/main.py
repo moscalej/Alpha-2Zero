@@ -7,13 +7,13 @@ from utils import *
 
 args = dotdict({
     'numIters': 1000,
-    'numEps': 400,
+    'numEps': 50,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
     'maxlenOfQueue': 200000,
-    'numMCTSSims': 24,
-    'arenaCompare': 40,
-    'cpuct': 10,
+    'numMCTSSims': 15,
+    'arenaCompare': 20,
+    'cpuct': 1,
     'epochs': 40,
     'checkpoint': './temp/',
     'load_model': False,

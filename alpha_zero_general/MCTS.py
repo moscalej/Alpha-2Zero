@@ -32,7 +32,7 @@ class MCTS():
                    proportional to Nsa[(s,a)]**(1./temp)
         """
         for i in range(self.args.numMCTSSims):
-            # self.branch_mem = {}  # TODO
+            self.branch_mem = {}  # TODO
             self.search(canonicalBoard)
 
         s = self.game.stringRepresentation(canonicalBoard)
@@ -73,7 +73,7 @@ class MCTS():
         """
 
         s = self.game.stringRepresentation(canonicalBoard)
-
+        self.branch_mem[s] = 1
         if s not in self.Es:
             self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
         if self.Es[s] != 0:
@@ -86,6 +86,7 @@ class MCTS():
             self.Ps[s], v = self.nnet.predict(canonicalBoard)
             t = max(self.Ps[s])
             valids = self.game.getValidMoves(canonicalBoard, 1)
+
             self.Ps[s] = self.Ps[s] * valids  # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
 
@@ -101,9 +102,16 @@ class MCTS():
 
             self.Vs[s] = valids
             self.Ns[s] = 0
+
             return -v
 
         valids = self.Vs[s]
+        for action in np.where(valids)[0]:
+            next_s, next_player = self.game.getNextState(canonicalBoard, 1, action)
+            next_s = self.game.getCanonicalForm(next_s, next_player)
+            if self.game.stringRepresentation(next_s) in self.branch_mem:
+                valids[action] = 0
+
         cur_best = -float('inf')
         best_act = -1
 
@@ -113,7 +121,7 @@ class MCTS():
                 if (s, a) in self.Qsa:
                     # This provides some exploration if Nsa is small then u will be bigger --> explore less
                     u = self.Qsa[(s, a)] + self.args.cpuct * self.Ps[s][a] * math.sqrt(self.Ns[s]) / (
-                                1 + self.Nsa[(s, a)])
+                            1 + self.Nsa[(s, a)])
                 else:
                     u = self.args.cpuct * self.Ps[s][a] * math.sqrt(self.Ns[s] + EPS)  # Q = 0 ?
 
@@ -136,12 +144,11 @@ class MCTS():
             v = self.search(next_s)
 
         except RecursionError:
-            print("recursion")
-            t = np.array(self.Ps[s])
-            print(f"np.sum(self.Ps[s]){np.sum(t != 0)}")
-            print(f'Values are : {t[t!=0]}')
-            self.Es[s] != 1e-4
-            return 0
+            b = self.game.get_board_obj(canonicalBoard)
+            print(f"Player1 step {b.decode_step_count()}:")
+            b.print_board(canonicalBoard, a)
+            print(len(self.branch_mem))
+            return 0 # so we don't favor any of the players
 
         if (s, a) in self.Qsa:  # if (s,a) exists, update, otherwise, set
             self.Qsa[(s, a)] = (self.Nsa[(s, a)] * self.Qsa[(s, a)] + v) / (self.Nsa[(s, a)] + 1)
