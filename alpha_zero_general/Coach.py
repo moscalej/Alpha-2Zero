@@ -6,7 +6,7 @@ from pytorch_classification.utils import Bar, AverageMeter
 import time, os, sys
 from pickle import Pickler, Unpickler
 from random import shuffle
-
+import sys
 
 class Coach:
     """
@@ -47,6 +47,18 @@ class Coach:
         while True:
             episodeStep += 1
             canonicalBoard = self.game.getCanonicalForm(board, self.curPlayer)
+            # TODO: remove after testing
+            if episodeStep % 20 == 0 and episodeStep != 1:
+                b = self.game.get_board_obj(canonicalBoard)
+                np.save(fr'C:/Users/afinkels/Desktop/private/Technion/Master studies/Project in Deep Learning/Alpha-2Zero-master/Alpha-2Zero/Opponent/testing/our_board_samples/{episodeStep}.npy', canonicalBoard)
+                # b = self.game.get_board_obj(canonicalBoard)
+                # redirect sys stdout
+                original = sys.stdout
+                sys.stdout = open(fr"C:/Users/afinkels/Desktop/private/Technion/Master studies/Project in Deep Learning/Alpha-2Zero-master/Alpha-2Zero/Opponent/testing/our_board_samples/{episodeStep}.txt", 'w')
+                print(f"step count {b.decode_step_count()}:")
+                b.print_board(canonicalBoard)
+                sys.stdout.close()
+                sys.stdout = original
             temp = int(episodeStep < self.args.tempThreshold)
 
             pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
