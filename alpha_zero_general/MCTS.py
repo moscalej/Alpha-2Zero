@@ -127,7 +127,7 @@ class MCTS():
         if verbose:
             b = self.game.get_board_obj(canonicalBoard)
             print(f"Player1 step {b.decode_step_count()}:")
-            b.print_board(canonicalBoard, a)
+            b.verbose_game(canonicalBoard, a)
         # <\debug>
 
         next_s, next_player = self.game.getNextState(canonicalBoard, 1, a)

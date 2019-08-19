@@ -7,7 +7,9 @@ import time, os, sys
 from pickle import Pickler, Unpickler
 from random import shuffle
 import sys
+import datetime
 
+from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board
 class Coach:
     """
     This class executes the self-play + learning. It uses the functions defined
@@ -44,21 +46,14 @@ class Coach:
         self.curPlayer = 1
         episodeStep = 0
 
+        sample_collection = True  # REMOVE
+        moves_verbose = []  # REMOVE
+        b_obj = Board()  # REMOVE
+
         while True:
             episodeStep += 1
             canonicalBoard = self.game.getCanonicalForm(board, self.curPlayer)
-            # TODO: remove after testing
-            if episodeStep % 20 == 0 and episodeStep != 1:
-                b = self.game.get_board_obj(canonicalBoard)
-                np.save(fr'C:/Users/afinkels/Desktop/private/Technion/Master studies/Project in Deep Learning/Alpha-2Zero-master/Alpha-2Zero/Opponent/testing/our_board_samples/{episodeStep}.npy', canonicalBoard)
-                # b = self.game.get_board_obj(canonicalBoard)
-                # redirect sys stdout
-                original = sys.stdout
-                sys.stdout = open(fr"C:/Users/afinkels/Desktop/private/Technion/Master studies/Project in Deep Learning/Alpha-2Zero-master/Alpha-2Zero/Opponent/testing/our_board_samples/{episodeStep}.txt", 'w')
-                print(f"step count {b.decode_step_count()}:")
-                b.print_board(canonicalBoard)
-                sys.stdout.close()
-                sys.stdout = original
+
             temp = int(episodeStep < self.args.tempThreshold)
 
             pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
@@ -67,6 +62,25 @@ class Coach:
                 trainExamples.append([b, self.curPlayer, p, None])
 
             action = np.random.choice(len(pi), p=pi)
+            moves_verbose.append(b_obj.verbose_game(canonicalBoard, action, no_board=True))
+            #########################  TODO: remove after testing
+            if episodeStep % 5 == 0 and episodeStep != 1 and sample_collection is True:
+                timestamp = datetime.datetime.now().strftime("%H_%M_%S")
+                np.save(
+                    fr'C:/Users/afinkels/Desktop/private/Technion/Master studies/Project in Deep Learning/Alpha-2Zero-master/Alpha-2Zero/Opponent/testing/our_board_samples/{timestamp}.npy',
+                    canonicalBoard)
+
+                # redirect sys stdout
+                original = sys.stdout
+                sys.stdout = open(
+                    fr"C:/Users/afinkels/Desktop/private/Technion/Master studies/Project in Deep Learning/Alpha-2Zero-master/Alpha-2Zero/Opponent/testing/our_board_samples/{timestamp}.txt",
+                    'w')
+                # print(f"step count {b.decode_step_count()}:")
+                print('\n'.join(moves_verbose))
+                b_obj.verbose_game(canonicalBoard)
+                sys.stdout.close()
+                sys.stdout = original
+            ########################
             # print(f"Player{self.curPlayer} is playing action: {action}")
             # print(f"Board before: \n{board}")
             board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)

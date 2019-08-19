@@ -38,7 +38,8 @@ def main(netname='TEST-rawest-TFR', team="white"):
 
 
 def init(name):
-    name = os.path.join(os.getcwd(), r'trained_networks', 'TFR', name)  # CHANGED
+    base = r'C:\Users\afinkels\Desktop\private\Technion\Master studies\Project in Deep Learning\Alpha-2Zero-master\Alpha-2Zero\Opponent'
+    name = os.path.join(base, r'trained_networks', 'TFR', name)  # CHANGED
     inputTO, TOnetwork, numTO, dataformat = load_net(name + "_TO")
 
     inputFROM, FROMnetwork, numFROM, dataformat = load_net(name + "_FROM")
@@ -114,7 +115,7 @@ def choose(TOnet, FROMnet, REMOVEnet, state, data_format):
         legalities = get_legalities(vec_4_leg[TOnet[1]],
                                     vec_4_leg[FROMnet[1]],
                                     vec_4_leg[REMOVEnet[1]],
-                                    FIRSTstate)
+                                    FIRSTstate, data_format=data_format)  # TODO: tell the guy to add the data format here
 
         if orderc[0] == 'T':
             legalities = legalities[0]

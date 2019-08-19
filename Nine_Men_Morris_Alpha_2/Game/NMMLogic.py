@@ -120,11 +120,11 @@ class Board(Base_mill):
         :return: None
         """
         steps = self.decode_step_count()
-        if steps >= 18 - 3:
+        if steps >= 18 - self.count_offset:
             return
         if steps == 0:
-            debug = np.sum(np.sum(np.abs(self.matrix_board)))
-            if debug < 4:
+            unencoded_step_count = np.sum(np.sum(np.abs(self.matrix_board)))
+            if unencoded_step_count <= 4:  # 4 pieces on board still don't encode
                 return
         self.encode_step_count(steps + 1)
 
@@ -133,7 +133,7 @@ class Board(Base_mill):
         for ind, val in enumerate(bin_str[::-1]):
             self.matrix_board[self.bits_map[ind]] = val
 
-    def decode_step_count(self):
+    def decode_step_count(self, board=None):
         """
         decode steps count from board encoding
         count is shifted  steps 0,1,2,3 => 0, and then 4=>1, 5=>2, ect..
@@ -144,11 +144,12 @@ class Board(Base_mill):
         # for key_pow, val_coor  in self.read_bits.items():
         #     steps += (self.matrix_board[val_coor] * 2) ** key_pow
         # return steps
-
-        bit3 = self.matrix_board[self.read_bits[3]]
-        bit2 = self.matrix_board[self.read_bits[2]]
-        bit1 = self.matrix_board[self.read_bits[1]]
-        bit0 = self.matrix_board[self.read_bits[0]]
+        if board is None:
+            board = self.matrix_board
+        bit3 = board[self.read_bits[3]]
+        bit2 = board[self.read_bits[2]]
+        bit1 = board[self.read_bits[1]]
+        bit0 = board[self.read_bits[0]]
         return int(f'0b{bit3}{bit2}{bit1}{bit0}', 2)
 
     def is_stage2(self):
@@ -156,7 +157,7 @@ class Board(Base_mill):
         check if
         :return: bool answering "is stage 2?"
         """
-        return self.decode_step_count() == 18 - 3  # stage 2 from 18th step count is shifted
+        return self.decode_step_count() == 18 - self.count_offset
 
     def cononical_board(self, player):
         step = self.decode_step_count()
@@ -186,7 +187,7 @@ class Board(Base_mill):
         if remove != 24:
             describe_moves.append(f"and Remove from {self.board_map[remove]}")
 
-    def print_board(self, board, action_code=None):
+    def verbose_game(self, board, action_code=None, no_board=False):
         withAction = action_code is not None
         set = []
         removed = []
@@ -213,7 +214,10 @@ class Board(Base_mill):
             if remove != 24:
                 removed.append(self.board_map[remove])
                 describe_moves.append(f"and Remove from {self.board_map[remove]}")
-            print('\n'.join(describe_moves))
+            moves_print = f"Action:{action_code} -> " + '\n'.join(describe_moves)
+            if no_board:
+                return moves_print
+            print(moves_print)
             b = Board(np.copy(board))
             b.decode_action(1, action_code)
             next_board = b.matrix_board
