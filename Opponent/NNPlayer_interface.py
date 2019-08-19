@@ -97,23 +97,22 @@ def NN_player_wrapper(name='TEST-rawest-TFR'):
     their_player = lambda state: choose(TOnet, FROMnet, REMOVEnet,
                                         state, data_format)  # (phase, action)
 
-    def opp_player(our_state, data_format=data_format):
+    def opp_player(our_state):
         g = NMMGame.MenMorris(9)
         b = g.get_board_obj(our_state)
         # the step count would be wrong for the initial 4 steps, but it doesn't effect the stage
         step_count = b.decode_step_count(b.get_clean_board(our_state)) + b.count_offset
         isStage2 = step_count >= 18
-        phase = 2 if isStage2 else 1
-        # try:
+        pi_mask = np.array(g.getValidMoves(our_state, 1))
         their_state = process_game_line(state_translator(our_state))
         TO, FROM, REMOVE = their_player(their_state)
-        return action_translator(isStage2, FROM, TO, REMOVE)
-        # except Exception as e:
-        #     print(f"opponent failed with: {e}")
-        #     pi_mask = np.array(g.getValidMoves(our_state, 1)) * 1
-        #     pi = pi_mask / np.sum(pi_mask)  # uniform distribution of all valid moves
-        #     return np.random.choice(3001, p=pi)
-
+        action_code = action_translator(isStage2, FROM, TO, REMOVE)
+        if pi_mask[action_code]:
+            return action_code
+        else:
+            print("chose invalid action, taking random action")
+            pi = (pi_mask * 1) / np.sum(pi_mask)  # uniform distribution of all valid moves
+            return np.random.choice(3001, p=pi)
     return opp_player
 
 
