@@ -44,7 +44,7 @@ class TaflGame(Game):
         # return a fixed size binary vector
         valids = [0]*self.getActionSize()
         b = board.getCopy()
-        legalMoves =  b.get_legal_moves(player)
+        legalMoves = b.get_legal_moves(player)
         if len(legalMoves)==0:
             valids[-1]=1
             return np.array(valids)

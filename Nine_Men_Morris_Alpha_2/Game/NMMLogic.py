@@ -196,7 +196,7 @@ class Board(Base_mill):
             if action_code == 24 * 5 * 25:
                 print(f"game ended action code: {action_code}")
                 return
-            piece, action, remove = np.unravel_index(action_code, (24, 5, 25))
+            piece, action, remove = np.unravel_index(action_code, (24, 5, 25), order='C')
             action_types = ['up', 'down', 'left', 'right']
 
             describe_moves = []
@@ -241,7 +241,7 @@ class Board(Base_mill):
             if (x_, y_) in set:
                 s = 'X'
                 color = 'yellow'
-            if (x_, y) in removed:
+            if (x_, y_) in removed:
                 s = '-'
                 color = 'red'
             return color, s
@@ -261,8 +261,8 @@ class Board(Base_mill):
         for y in range(n):
             print(y, "|", end="")  # print the row #
             for x in range(n):
-                piece = next_board[y][x]  # get the piece to print
-                color, s = getColor(x, y, piece)
+                piece = next_board[y, x]  # get the piece to print
+                color, s = getColor(y, x, piece)  # TODO: make sure x,y swap was right
                 if piece == -1:
                     print(colored(f"{s} ", color), end="")
                 elif piece == 1:
