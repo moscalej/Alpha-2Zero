@@ -63,6 +63,14 @@ def state_translator(board: np.array):
 
 
 def action_translator(is_stage2, TOc, FROMc, REMOVEc):
+    """
+
+    :param is_stage2: bool
+    :param TOc: int from 0 - 24
+    :param FROMc: int from 0 - 24
+    :param REMOVEc: int from 0 - 24
+    :return:
+    """
     # TODO: read following notes:
     # if phase 1, the FROMc is TOc
     # if phase 2, same as written
@@ -71,10 +79,10 @@ def action_translator(is_stage2, TOc, FROMc, REMOVEc):
     a = [23, 4, 24]  # indices are -1 subtracted to match max index
     if not is_stage2:
         # set piece
-        a[0] = get_a(FROMc)  # variable name is not mistake
-        if REMOVEc:
+        a[0] = get_a(FROMc)  # variable name is not a mistake
+        if REMOVEc != 0:
             a[2] = get_a(REMOVEc)
-    else:
+    elif min(FROMc, TOc) != 0:
         # move piece
         from_ = get_a(FROMc)
         to_ = get_a(TOc)
@@ -82,9 +90,9 @@ def action_translator(is_stage2, TOc, FROMc, REMOVEc):
             a[1] = board_obj.adjacent[from_].index(to_)
         except:
             print("illegal")
-        if REMOVEc:
+        if REMOVEc != 0:
             a[2] = get_a(REMOVEc)
-    action = np.ravel_multi_index(a, dims=(24, 5, 25), order='F')
+    action = np.ravel_multi_index(a, dims=(24, 5, 25), order='C')
 
     return action
 
@@ -101,16 +109,22 @@ def NN_player_wrapper(name='TEST-rawest-TFR'):
         g = NMMGame.MenMorris(9)
         b = g.get_board_obj(our_state)
         # the step count would be wrong for the initial 4 steps, but it doesn't effect the stage
-        step_count = b.decode_step_count(b.get_clean_board(our_state)) + b.count_offset
+        step_count = b.decode_step_count(our_state) + b.count_offset
         isStage2 = step_count >= 18
         pi_mask = np.array(g.getValidMoves(our_state, 1))
-        their_state = process_game_line(state_translator(our_state))
+        their_state_ = state_translator(our_state)
+        their_state = process_game_line(their_state_)
         TO, FROM, REMOVE = their_player(their_state)
         action_code = action_translator(isStage2, FROM, TO, REMOVE)
+
         if pi_mask[action_code]:
             return action_code
         else:
             print("chose invalid action, taking random action")
+            print("Original Action Details:")
+            print(f"action_code: {action_code} ; Stage: {2 if isStage2 else 1}")
+            print(b.verbose_game(our_state, action_code, no_board=True))
+            print(f"their remaining: {their_state_[24:26]}")
             pi = (pi_mask * 1) / np.sum(pi_mask)  # uniform distribution of all valid moves
             return np.random.choice(3001, p=pi)
     return opp_player

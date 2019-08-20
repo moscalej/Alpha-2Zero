@@ -38,7 +38,7 @@ class MenMorris(Game):
     def getValidMoves(self, board: np.ndarray, player):
         # return a fixed size binary vector
         b = Board(board.copy())
-        b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys())) + 1)]
+        b.board = [b.matrix_board[b.board_map[i]] for i in range(24)]
         legalMoves = b.get_legal_moves(player)
         legalMoves = list(legalMoves.reshape(-1))
         legalMoves.extend([0 if np.sum(legalMoves) > 0 else 1])
@@ -48,7 +48,7 @@ class MenMorris(Game):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
         b = Board(board.copy())
-        b.board = [b.matrix_board[b.board_map[i]] for i in range(max(list(b.board_map.keys())) + 1)]
+        b.board = [b.matrix_board[b.board_map[i]] for i in range(24)]
         if b.is_win(-player):
             return -player
         if b.is_win(player):

@@ -20,6 +20,7 @@ class State:
         self.eob = int(eob)
         self.my_phase = 2
         self.enemy_phase = 2
+
         if self.moh > 0:
             self.my_phase = 1
         elif (self.mob == 3):

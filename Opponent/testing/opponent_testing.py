@@ -52,10 +52,12 @@ def test_player():
     player = NN_player_wrapper()
     base = fr'C:/Users/afinkels/Desktop/private/Technion/Master studies/Project in Deep Learning/Alpha-2Zero-master/Alpha-2Zero/Opponent/testing/our_board_samples/'
     samples = list(set([file.split('.')[0] for file in os.listdir(base)]))
+    samples = ['23_47_32']
     b = NMMLogic.Board()
 
     for sample in samples:
         # path_txt = os.path.join(base, fr'{sample}.txt')
+        print(f"Sample: {sample}")
         path_npy = os.path.join(base, fr'{sample}.npy')
         our_board = np.load(path_npy)
         action = player(our_board)
@@ -66,3 +68,4 @@ def test_player():
 
 if __name__ == "__main__":
     test_player()
+    # test_board_translations()

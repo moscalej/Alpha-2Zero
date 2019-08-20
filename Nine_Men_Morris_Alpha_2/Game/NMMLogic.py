@@ -60,11 +60,11 @@ class Board(Base_mill):
             legal_pos = np.where(array_board == 0)[0]
             for pos in legal_pos:
                 if self.is_mill(player, pos, self.board):  # current selection completes a mill
-                    opp_pos = np.where(self.board == -player)[0]
+                    opp_pos = np.where(array_board == -player)[0]
                     opp_pos = [opp_p for opp_p in opp_pos if
                                not self.is_mill(-player, opp_p, self.board)]  # can't remove opponent in mill
                     if len(opp_pos) == 0:  # exception for the case where all opponents pieces are in mills
-                        opp_pos = np.where(self.board == -player)[0]
+                        opp_pos = np.where(array_board == -player)[0]
                     action_mask[pos, -1, opp_pos] = True
                 else:
                     action_mask[pos, -1, -1] = True  # place piece on board
@@ -80,7 +80,7 @@ class Board(Base_mill):
                         opp_pos = np.where(array_board == -player)[0]
                         opp_pos = [opp_p for opp_p in opp_pos if not self.is_mill(-player, opp_p, if_played_board)]
                         if len(opp_pos) == 0:  # exception for the case where all opponents pieces are in mills
-                            opp_pos = np.where(self.board == -player)[0]
+                            opp_pos = np.where(array_board == -player)[0]
                         action_mask[from_pos, orient, opp_pos] = True
                     else:
                         action_mask[from_pos, orient, -1] = True

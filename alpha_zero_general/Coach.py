@@ -62,8 +62,8 @@ class Coach:
                 trainExamples.append([b, self.curPlayer, p, None])
 
             action = np.random.choice(len(pi), p=pi)
-            moves_verbose.append(b_obj.verbose_game(canonicalBoard, action, no_board=True))
             #########################  TODO: remove after testing
+            moves_verbose.append(b_obj.verbose_game(canonicalBoard, action, no_board=True))
             if episodeStep % 5 == 0 and episodeStep != 1 and sample_collection is True:
                 timestamp = datetime.datetime.now().strftime("%H_%M_%S")
                 np.save(

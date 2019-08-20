@@ -11,206 +11,206 @@ import numpy
 # position which are aligned on the same line of the key
 # in particular, the left-most position
 row1 = {
-        0: 0,
-        1: 2,
-        2: 1,
-        3: 1,
-        4: 5,
-        5: 4,
-        6: 4,
-        7: 8,
-        8: 7,
-        9: 7,
-        10: 11,
-        11: 10,
-        12: 10,
-        13: 14,
-        14: 13,
-        15: 13,
-        16: 17,
-        17: 16,
-        18: 16,
-        19: 20,
-        20: 19,
-        21: 19,
-        22: 23,
-        23: 22,
-        24: 22
-        }
+    0: 0,
+    1: 2,
+    2: 1,
+    3: 1,
+    4: 5,
+    5: 4,
+    6: 4,
+    7: 8,
+    8: 7,
+    9: 7,
+    10: 11,
+    11: 10,
+    12: 10,
+    13: 14,
+    14: 13,
+    15: 13,
+    16: 17,
+    17: 16,
+    18: 16,
+    19: 20,
+    20: 19,
+    21: 19,
+    22: 23,
+    23: 22,
+    24: 22
+}
 
 # position which are aligned on the same line of the key
 # in particular, the right-most position
 row2 = {
-        0: 0,
-        1: 3,
-        2: 3,
-        3: 2,
-        4: 6,
-        5: 6,
-        6: 5,
-        7: 9,
-        8: 9,
-        9: 8,
-        10: 12,
-        11: 12,
-        12: 11,
-        13: 15,
-        14: 15,
-        15: 14,
-        16: 18,
-        17: 18,
-        18: 17,
-        19: 21,
-        20: 21,
-        21: 20,
-        22: 24,
-        23: 24,
-        24: 23
-        }
+    0: 0,
+    1: 3,
+    2: 3,
+    3: 2,
+    4: 6,
+    5: 6,
+    6: 5,
+    7: 9,
+    8: 9,
+    9: 8,
+    10: 12,
+    11: 12,
+    12: 11,
+    13: 15,
+    14: 15,
+    15: 14,
+    16: 18,
+    17: 18,
+    18: 17,
+    19: 21,
+    20: 21,
+    21: 20,
+    22: 24,
+    23: 24,
+    24: 23
+}
 
 # position which are aligned on the same column of the key
 # in particular, the up-most position
 column1 = {
-           0: 0,
-           1: 10,
-           2: 5,
-           3: 15,
-           4: 11,
-           5: 2,
-           6: 14,
-           7: 12,
-           8: 2,
-           9: 13,
-           10: 1,
-           11: 4,
-           12: 7,
-           13: 9,
-           14: 6,
-           15: 3,
-           16: 7,
-           17: 20,
-           18: 9,
-           19: 4,
-           20: 17,
-           21: 6,
-           22: 1,
-           23: 17,
-           24: 3
-        }
+    0: 0,
+    1: 10,
+    2: 5,
+    3: 15,
+    4: 11,
+    5: 2,
+    6: 14,
+    7: 12,
+    8: 2,
+    9: 13,
+    10: 1,
+    11: 4,
+    12: 7,
+    13: 9,
+    14: 6,
+    15: 3,
+    16: 7,
+    17: 20,
+    18: 9,
+    19: 4,
+    20: 17,
+    21: 6,
+    22: 1,
+    23: 17,
+    24: 3
+}
 
 # position which are aligned on the same column of the key
 # in particular, the down-most position
 column2 = {
-           0: 0,
-           1: 22,
-           2: 8,
-           3: 24,
-           4: 19,
-           5: 8,
-           6: 21,
-           7: 16,
-           8: 5,
-           9: 18,
-           10: 22,
-           11: 19,
-           12: 16,
-           13: 18,
-           14: 21,
-           15: 24,
-           16: 12,
-           17: 23,
-           18: 13,
-           19: 11,
-           20: 23,
-           21: 14,
-           22: 10,
-           23: 20,
-           24: 15
-        }
+    0: 0,
+    1: 22,
+    2: 8,
+    3: 24,
+    4: 19,
+    5: 8,
+    6: 21,
+    7: 16,
+    8: 5,
+    9: 18,
+    10: 22,
+    11: 19,
+    12: 16,
+    13: 18,
+    14: 21,
+    15: 24,
+    16: 12,
+    17: 23,
+    18: 13,
+    19: 11,
+    20: 23,
+    21: 14,
+    22: 10,
+    23: 20,
+    24: 15
+}
 
 # for each position (1-24) indicates which of the other 24 positions (1-24)
 # are adjacent
 near = {
-        0: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0],
-        1: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0],
-        2: [0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0],
-        3: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-            0, 0, 0, 0],
-        4: [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0],
-        5: [0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0],
-        6: [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0],
-        7: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-            0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0],
-        8: [0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0],
-        9: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0],
-        10: [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 1, 0, 0],
-        11: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-             0, 1, 0, 0, 0, 0, 0, 0, 1, 0,
-             0, 0, 0, 0],
-        12: [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
-             1, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-             0, 0, 0, 0],
-        13: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-             0, 0, 0, 1, 0, 0, 0, 1, 0, 0,
-             0, 0, 0, 0],
-        14: [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-             0, 0, 1, 0, 1, 0, 0, 0, 0, 0,
-             1, 0, 0, 0],
-        15: [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 1],
-        16: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 1, 0, 0, 0, 0, 1, 0, 0, 0,
-             0, 0, 0, 0],
-        17: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 1, 0, 1, 0, 1,
-             0, 0, 0, 0],
-        18: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 1, 0, 0, 0, 1, 0, 0, 0,
-             0, 0, 0, 0],
-        19: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-             0, 0, 0, 0],
-        20: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 1, 0, 1, 0,
-             1, 0, 1, 0],
-        21: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-             0, 0, 0, 0],
-        22: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 1, 0],
-        23: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-             0, 1, 0, 1],
-        24: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-             0, 0, 1, 0]
-        }
+    0: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0],
+    1: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0],
+    2: [0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0],
+    3: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+        0, 0, 0, 0],
+    4: [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0],
+    5: [0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0],
+    6: [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+        0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0],
+    7: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+        0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0],
+    8: [0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0],
+    9: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+        0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0],
+    10: [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 1, 0, 0],
+    11: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+         0, 1, 0, 0, 0, 0, 0, 0, 1, 0,
+         0, 0, 0, 0],
+    12: [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+         1, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+         0, 0, 0, 0],
+    13: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+         0, 0, 0, 1, 0, 0, 0, 1, 0, 0,
+         0, 0, 0, 0],
+    14: [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+         0, 0, 1, 0, 1, 0, 0, 0, 0, 0,
+         1, 0, 0, 0],
+    15: [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 1],
+    16: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 1, 0, 0, 0, 0, 1, 0, 0, 0,
+         0, 0, 0, 0],
+    17: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 1, 0, 1, 0, 1,
+         0, 0, 0, 0],
+    18: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 1, 0, 0, 0, 1, 0, 0, 0,
+         0, 0, 0, 0],
+    19: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+         0, 0, 0, 0],
+    20: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 1, 0, 1, 0,
+         1, 0, 1, 0],
+    21: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+         0, 0, 0, 0],
+    22: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 1, 0],
+    23: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+         0, 1, 0, 1],
+    24: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+         0, 0, 1, 0]
+}
 
 
 def TFR_legality_test(choicesTO, choicesFROM, choicesREMOVE,
-                         X_REMOVE, data_format="binary raw"):
+                      X_REMOVE, data_format="binary raw"):
     num = len(choicesTO)
 
     result = numpy.zeros((num), dtype="int32")
@@ -247,7 +247,7 @@ def TFR_legality_test(choicesTO, choicesFROM, choicesREMOVE,
 
         # if there are three checkers aligned, in one direction or both, there
         # is a mill
-        checktris = trisrow * (1 - triscol) + triscol * (1 - trisrow) +\
+        checktris = trisrow * (1 - triscol) + triscol * (1 - trisrow) + \
                     trisrow * triscol
 
         # if there is a tris, the remove choice must be present
@@ -258,7 +258,7 @@ def TFR_legality_test(choicesTO, choicesFROM, choicesREMOVE,
 
 
 def FT_legality_test(choicesTO, choicesFROM, X_FROM,
-                       data_format="binary raw"):
+                     data_format="binary raw"):
     num = len(choicesTO)
     result = numpy.zeros((num), dtype="int32")
     for i in range(num):
@@ -294,10 +294,10 @@ def TO_self_legality_test(choicesTO, X_TO, data_format="binary raw"):
                 # control if there is a friendly stone adjacent
                 # find the adjacent ones
                 adjacents = near[choiceTO]
-                
+
                 # verify if there is a player stone
                 for j in range(1, 25):
-                   
+
                     if adjacents[j] == 1 and is_position_player(X_TO[i], j, data_format):
                         adj = True
                         break
@@ -313,7 +313,7 @@ def TO_self_legality_test(choicesTO, X_TO, data_format="binary raw"):
 # position: between 1 and 24
 def is_position_player(X, position, data_format="binary raw"):
     if (data_format == "binary raw" or data_format == "binary rawer" or
-        data_format == "binary rawest"):
+            data_format == "binary rawest"):
         if position == 0:
             return False
         if X[position - 1] == 1:
@@ -325,7 +325,7 @@ def is_position_player(X, position, data_format="binary raw"):
 # position: between 1 and 24
 def is_position_enemy(X, position, data_format="binary raw"):
     if (data_format == "binary raw" or data_format == "binary rawer" or
-        data_format == "binary rawest"):
+            data_format == "binary rawest"):
         if position == 0:
             return False
         if X[position + 23] == 1:
@@ -337,7 +337,7 @@ def is_position_enemy(X, position, data_format="binary raw"):
 # position: between 1 and 24
 def is_position_empty(X, position, data_format="binary raw"):
     if (data_format == "binary raw" or data_format == "binary rawer" or
-        data_format == "binary rawest"):
+            data_format == "binary rawest"):
         if position == 0:
             return False
         if X[position + 47] == 1:
@@ -359,10 +359,10 @@ def is_phase_2(X, data_format="binary raw"):
             return False
     elif (data_format == "binary rawest"):
         # if there are no checkers in my hand
-        if(X[72] == 0):
+        if (X[72] == 0):
             n = 0
             # count the checkers on the board
-            for i in range (0,24):
+            for i in range(0, 24):
                 if X[i] == 1:
                     n += 1
             # if there are more than 3 checkers, it's phase 2
@@ -372,7 +372,6 @@ def is_phase_2(X, data_format="binary raw"):
                 return False
         else:
             return False
-        
 
 
 def is_phase_1(X, data_format="binary raw"):
@@ -382,12 +381,12 @@ def is_phase_1(X, data_format="binary raw"):
         else:
             return False
     elif (data_format == "binary rawer"):
-        if(X[91] == 0):
+        if (X[91] == 0):
             return True
         else:
             return False
     elif (data_format == "binary rawest"):
-        if(X[72] == 1):
+        if (X[72] == 1):
             return True
         else:
             return False
@@ -400,16 +399,16 @@ def is_phase_3(X, data_format="binary raw"):
         else:
             return False
     elif (data_format == "binary rawer"):
-        if(X[92] == 1):
+        if (X[92] == 1):
             return True
         else:
             return False
     elif (data_format == "binary rawest"):
         # if there are no checkers in my hand
-        if(X[72] == 0):
+        if (X[72] == 0):
             n = 0
             # count the checkers on the board
-            for i in range (0,24):
+            for i in range(0, 24):
                 if X[i] == 1:
                     n += 1
             # if there are more than 3 checkers, it not phase 3
@@ -455,29 +454,29 @@ def REMOVE_self_legality_test(choicesREMOVE, X_REMOVE,
             result[i] = 1
         else:
             # verify if the position of the removal is occupied by an enemy
-            if is_position_enemy(X_REMOVE[i], choiceREMOVE, data_format) :
+            if is_position_enemy(X_REMOVE[i], choiceREMOVE, data_format):
 
                 # verify if the removed one is aligned
                 opta = row1[choiceREMOVE]
                 optb = row2[choiceREMOVE]
                 optc = column1[choiceREMOVE]
                 optd = column2[choiceREMOVE]
-                
+
                 trisrow = 0
                 triscol = 0
-                
+
                 # verify if in the column/row there are the enemy's stones
-                trisrow = is_position_enemy(X_REMOVE[i], opta, data_format) and\
+                trisrow = is_position_enemy(X_REMOVE[i], opta, data_format) and \
                           is_position_enemy(X_REMOVE[i], optb, data_format)
-                triscol = is_position_enemy(X_REMOVE[i], optc, data_format) and\
+                triscol = is_position_enemy(X_REMOVE[i], optc, data_format) and \
                           is_position_enemy(X_REMOVE[i], optd, data_format)
-                
+
                 if (not trisrow) and (not triscol):
                     result[i] = 1
                 else:
                     # verify if there is any not aligned stone
                     notaligned = False
-                    for j in range (1, 25):
+                    for j in range(1, 25):
                         opta = row1[j]
                         optb = row2[j]
                         optc = column1[j]
@@ -485,18 +484,18 @@ def REMOVE_self_legality_test(choicesREMOVE, X_REMOVE,
                         trisrow = 0
                         triscol = 0
                         # verify if in the column/row there are the enemy's stones
-                        trisrow = is_position_enemy(X_REMOVE[i], opta, data_format) and\
+                        trisrow = is_position_enemy(X_REMOVE[i], opta, data_format) and \
                                   is_position_enemy(X_REMOVE[i], optb, data_format)
-                        triscol = is_position_enemy(X_REMOVE[i], optc, data_format) and\
+                        triscol = is_position_enemy(X_REMOVE[i], optc, data_format) and \
                                   is_position_enemy(X_REMOVE[i], optd, data_format)
                         if (not trisrow) and (not triscol):
                             notaligned = True
-                    
+
                     if notaligned:
                         result[i] = 0
                     else:
                         result[i] = 1
-                
+
             else:
                 result[i] = 0
     return result
@@ -511,8 +510,7 @@ def REMOVE_self_legality_test(choicesREMOVE, X_REMOVE,
 # - WholeREMOVE: TO_self, FROM_self, REMOVE_self and REMOVE-FROM-TO
 # - WholeMOVE: exceptREMOVE and WholeREMOVE
 def get_legalities(TO_choice, FROM_choice, REMOVE_choice,
-                     X_test, data_format="binary raw"):
-    
+                   X_test, data_format="binary raw"):
     if TO_choice is not None:
         TO_self_leg = TO_self_legality_test(TO_choice, X_test, data_format)
     else:
@@ -523,7 +521,7 @@ def get_legalities(TO_choice, FROM_choice, REMOVE_choice,
     else:
         FROM_self_leg = None
 
-    if TO_choice is not None and FROM_choice is not None :
+    if TO_choice is not None and FROM_choice is not None:
         FT_leg = FT_legality_test(TO_choice, FROM_choice, X_test, data_format)
     else:
         FT_leg = None
@@ -533,37 +531,37 @@ def get_legalities(TO_choice, FROM_choice, REMOVE_choice,
                                                     data_format)
     else:
         REMOVE_self_leg = None
-    
+
     if (TO_choice is not None and FROM_choice is not None and
-        REMOVE_choice is not None) :
+            REMOVE_choice is not None):
         TFR_leg = TFR_legality_test(TO_choice, FROM_choice, REMOVE_choice,
-                                          X_test, data_format)
+                                    X_test, data_format)
     else:
         TFR_leg = None
 
-    if TO_choice is not None and FROM_choice is not None :
+    if TO_choice is not None and FROM_choice is not None:
         m1 = numpy.multiply(TO_self_leg, FROM_self_leg)
         exceptREMOVE = numpy.multiply(m1, FT_leg)
     else:
         exceptREMOVE = None
         m1 = None
-        
+
     if (TO_choice is not None and FROM_choice is not None and
-        REMOVE_choice is not None) :
+            REMOVE_choice is not None):
         m2 = numpy.multiply(m1, REMOVE_self_leg)
         wholeREMOVE = numpy.multiply(m2, TFR_leg)
         wholeMOVE = numpy.multiply(wholeREMOVE, exceptREMOVE)
     else:
         wholeREMOVE = None
         wholeMOVE = None
-        
+
     # TODO: improve this
     if (TO_choice is not None and REMOVE_choice is not None):
         exceptFROM = numpy.multiply(TO_self_leg, REMOVE_self_leg)
     else:
-        exceptFROM = None        
-        
-    # TODO: improve this
+        exceptFROM = None
+
+        # TODO: improve this
     if (FROM_choice is not None and REMOVE_choice is not None):
         exceptTO = numpy.multiply(FROM_self_leg, REMOVE_self_leg)
     else:
@@ -574,4 +572,3 @@ def get_legalities(TO_choice, FROM_choice, REMOVE_choice,
 
 # if (109 == 0) fase 1
 # if (110 == 1) fase 3
-  
