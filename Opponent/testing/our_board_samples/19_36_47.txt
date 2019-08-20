@@ -1,0 +1,28 @@
+Action:374 -> Set a piece in (0, 6)
+Action:124 -> Set a piece in (0, 0)
+Action:2499 -> Set a piece in (3, 2)
+Action:624 -> Set a piece in (3, 6)
+Action:2374 -> Set a piece in (2, 4)
+Action:2749 -> Set a piece in (4, 2)
+Action:1374 -> Set a piece in (1, 5)
+Action:874 -> Set a piece in (6, 3)
+Action:2624 -> Set a piece in (3, 4)
+Action:2874 -> Set a piece in (4, 3)
+Action:1870 -> Set a piece in (5, 3)
+and Remove from (3, 4)
+Action:2124 -> Set a piece in (2, 2)
+Action:2993 -> Set a piece in (4, 4)
+and Remove from (2, 4)
+Action:749 -> Set a piece in (6, 0)
+Action:477 -> Set a piece in (3, 0)
+and Remove from (0, 6)
+   0 1 2 3 4 5 6 
+  ----------------
+0 |[34mX [0m[34m  [0m[34m  [0m[37m- [0m[34m  [0m[34m  [0m[35mO [0m|
+1 |[34m  [0m[37m- [0m[34m  [0m[37m- [0m[34m  [0m[35mO [0m[34m  [0m|
+2 |[34m  [0m[34m  [0m[34mX [0m[37m- [0m[37m- [0m[34m  [0m[34m  [0m|
+3 |[37m- [0m[37m- [0m[35mO [0m[34m  [0m[37m- [0m[37m- [0m[34mX [0m|
+4 |[34m  [0m[34m  [0m[34mX [0m[34mX [0m[35mO [0m[34m  [0m[34m  [0m|
+5 |[34m  [0m[37m- [0m[34m  [0m[35mO [0m[34m  [0m[37m- [0m[34m  [0m|
+6 |[34mX [0m[34m  [0m[34m  [0m[34mX [0m[34m  [0m[34m  [0m[37m- [0m|
+  ----------------
