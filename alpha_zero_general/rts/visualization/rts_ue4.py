@@ -39,7 +39,7 @@ class TD2020LearnAPI(TFPluginAPI):
 
     def onSetup(self):
         """
-        Sets up nnet configs and mcts. It loads model in ram. Session variable is saved, so it can be then used async in 'onJsonInput'
+        Sets up neural_network configs and mcts. It loads model in ram. Session variable is saved, so it can be then used async in 'onJsonInput'
         """
         graph = tf.Graph()
         with graph.as_default():
@@ -63,7 +63,7 @@ class TD2020LearnAPI(TFPluginAPI):
         Json input is recieved from UE4, providing game state in ue4. This game state must reflect same configuration as Python one.
         Keep in mind coordinate system orientation
         :param jsonInput: initial board config and player, requesting action
-        :return: recommended action using our nnet
+        :return: recommended action using our neural_network
         """
         if not self.setup:
             return

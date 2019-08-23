@@ -19,7 +19,7 @@ rp = RandomTaflPlayer(g).play
 gp = GreedyTaflPlayer(g).play
 hp = HumanTaflPlayer(g).play
 
-# nnet players
+# neural_network players
 #n1 = NNet(g)
 #n1.load_checkpoint('./pretrained_models/tafl/keras/','6x100x25_best.pth.tar')
 #args1 = dotdict({'numMCTSSims': 50, 'cpuct':1.0})

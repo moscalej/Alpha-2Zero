@@ -16,7 +16,7 @@ from utils import dotdict
 """
 RTSPlayers.py
 
-Contains 3 players (human player, random player, greedy player (if searching for nnet player, it is defined by pre-learnt model)
+Contains 3 players (human player, random player, greedy player (if searching for neural_network player, it is defined by pre-learnt model)
 Human player has defined input controls for Pygame and console
 """
 

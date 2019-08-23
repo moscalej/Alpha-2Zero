@@ -98,7 +98,7 @@ class NNetWrapper(NeuralNet):
 
         for epoch in range(args.epochs):
             print('EPOCH ::: ' + str(epoch+1))
-            # self.nnet.train()
+            # self.neural_network.train()
             data_time = AverageMeter()
             batch_time = AverageMeter()
             pi_losses = AverageMeter()

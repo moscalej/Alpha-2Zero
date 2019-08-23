@@ -2,7 +2,7 @@ from Coach import Coach
 
 # from othello.OthelloGame import OthelloGame as Game
 from Nine_Men_Morris_Alpha_2.Game.NMMGame import MenMorris as Game
-from Nine_Men_Morris_Alpha_2.keras.NNet import NNetWrapper as NeuroNetwork
+from Nine_Men_Morris_Alpha_2.keras.NNet import NNetWrapper as NeuralNetwork
 from utils import *
 
 args = dotdict({
@@ -30,13 +30,13 @@ if __name__=="__main__":
     # sys.setrecursionlimit(10000)
     #
     game = Game(men_count=9)
-    nnet = NeuroNetwork(game)
+    neural_network = NeuralNetwork(game)
 
     if args.load_model:
-        nnet.load_checkpoint(args.load_folder_file[0], args.load_folder_file[1])
+        neural_network.load_checkpoint(args.load_folder_file[0], args.load_folder_file[1])
 
-    c = Coach(game, nnet, args)
+    coach = Coach(game, neural_network, args)
     if args.load_model:
         print("Load trainExamples from file")
-        c.loadTrainExamples()
-    c.learn()
+        coach.loadTrainExamples()
+    coach.learn()

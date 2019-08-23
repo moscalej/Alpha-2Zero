@@ -288,7 +288,7 @@ class Configuration:
             self.epochs = epochs  # times training examples are iterated through learning process
             self.batch_size = batch_size  # how many train examples are taken together for learning
             self.cuda = cuda  # this is only relevant when using TF GPU
-            self.num_channels = num_channels  # used by nnet conv layers
+            self.num_channels = num_channels  # used by neural_network conv layers
 
             # Should one-hot encoder be used (recommended)
             if use_one_hot_encoder:
@@ -443,7 +443,7 @@ class Configuration:
                            player_model_file: str):
             from rts.RTSPlayers import RandomPlayer, GreedyRTSPlayer, HumanRTSPlayer
 
-            if player_type == 'nnet':
+            if player_type == 'neural_network':
                 if player_config is None:
                     print("Invalid pit configuration. Returning")
                     exit(1)
@@ -576,8 +576,8 @@ class Configuration:
                  save_train_examples: bool = False,
                  load_train_examples: bool = False,
 
-                 player1_type: str = 'nnet',
-                 player2_type: str = 'nnet',
+                 player1_type: str = 'neural_network',
+                 player2_type: str = 'neural_network',
                  player1_config: dict = None,
                  player2_config: dict = None,
                  num_games: int = 4,
@@ -647,7 +647,7 @@ class Configuration:
             ``
         :param score_function_player1: which function to use (1, 2 or 3)
         :param timeout_player1: After what time game will timeout if 'useTimeout' is set to true
-        :param player1_model_file: Filename in temp folder that player 1 nnet player uses
+        :param player1_model_file: Filename in temp folder that player 1 neural_network player uses
 
         :param onehot_encoder_player2: Which encoder should this player use while pitting
         :param money_increment_player2: How much money player should gain when worker returns gold coins
@@ -700,7 +700,7 @@ class Configuration:
             ``
         :param score_function_player2: which function to use (1, 2 or 3)
         :param timeout_player2: After what time game will timeout if 'useTimeout' is set to true
-        :param player2_model_file: Filename in temp folder that player 2 nnet player uses
+        :param player2_model_file: Filename in temp folder that player 2 neural_network player uses
 
 
         :param num_iters: How many iterations of games it should be played
@@ -718,10 +718,10 @@ class Configuration:
         :param save_train_examples: If train examples should be saved to file (Caution if choosing this, because of memory error)
         :param load_train_examples: If train examples should be loaded from file (Caution if choosing this, because of memory error)
 
-        :param player1_type: What type should player 1 be ("nnet", "random", "greedy", "human")
-        :param player2_type: What type should player 2 be ("nnet", "random", "greedy", "human")
-        :param player1_config: If "nnet" player is chosen, config can be provided {'numMCTSSims': 2, 'cpuct': 1.0}
-        :param player2_config: If "nnet" player is chosen, config can be provided {'numMCTSSims': 2, 'cpuct': 1.0}
+        :param player1_type: What type should player 1 be ("neural_network", "random", "greedy", "human")
+        :param player2_type: What type should player 2 be ("neural_network", "random", "greedy", "human")
+        :param player1_config: If "neural_network" player is chosen, config can be provided {'numMCTSSims': 2, 'cpuct': 1.0}
+        :param player2_config: If "neural_network" player is chosen, config can be provided {'numMCTSSims': 2, 'cpuct': 1.0}
         :param num_games: How many games should be played for pit config
 
         :param use_one_hot_encoder: If oneHot encoder should be used for both players while learning. (While pitting see configs encoder_player1, onehot_encoder_player2)

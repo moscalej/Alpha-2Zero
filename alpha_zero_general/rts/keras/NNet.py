@@ -11,7 +11,7 @@ from rts.src.config import VERBOSE_MODEL_FIT
 """
 NNet.py
 
-NNet wrapper uses defined nnet model to train and predict
+NNet wrapper uses defined neural_network model to train and predict
 
 funny error message from tf :) - tensorflow.python.framework.errors_impl.NotFoundError: No algorithm worked!
 """
@@ -21,7 +21,7 @@ funny error message from tf :) - tensorflow.python.framework.errors_impl.NotFoun
 class NNetWrapper(NeuralNet):
     def __init__(self, game, encoder=None):
         """
-        Creates nnet wrapper with game configuration and encoder
+        Creates neural_network wrapper with game configuration and encoder
         :param game: game configuration
         :param encoder: encoded that will be used for training and later predictions
         """
