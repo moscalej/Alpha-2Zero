@@ -29,20 +29,20 @@ class MenMorris(Game):
         # action must be a valid move
 
         if action == (self.actionSize - 1):  # ?? TODO validate probably end of game
-            return (board, -player)
+            return board, -player
         b = Board(board.copy())
         b.decode_action(player, action)
         # board = np.copy(b.matrix_board)
         return b.matrix_board, -player
 
-    def get_valid_moves(self, board: np.ndarray, player):
+    def get_valid_moves(self, board: np.ndarray, player:int) -> list:
         # return a fixed size binary vector
         b = Board(board.copy())
         b.board = [b.matrix_board[b.board_map[i]] for i in range(24)]
-        legalMoves = b.get_legal_moves(player)
-        legalMoves = list(legalMoves.reshape(-1))
-        legalMoves.extend([0 if np.sum(legalMoves) > 0 else 1])
-        return legalMoves
+        legal_moves = b.get_legal_moves(player)
+        legal_moves = list(legal_moves.reshape(-1))
+        legal_moves.extend([0 if np.sum(legal_moves) > 0 else 1])
+        return legal_moves
 
     def get_game_ended(self, board: np.ndarray, player):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
@@ -82,7 +82,7 @@ class MenMorris(Game):
         l = [(board, pi)]
         return l
 
-    def string_representation(self, board):
+    def string_representation(self, board:np.ndarray):
         # 8x8 numpy array (canonical board)
         return board.tostring()
 
