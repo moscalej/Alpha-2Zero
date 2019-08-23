@@ -1,6 +1,7 @@
 from collections import deque
 from Arena import Arena
 from MCTS import MCTS
+
 import numpy as np
 from pytorch_classification.utils import Bar, AverageMeter
 import time, os, sys
@@ -9,7 +10,11 @@ from random import shuffle
 import sys
 import datetime
 
+PATH = r'C:\Users\amoscoso\Documents\Technion\deeplearning\Alpha-2Zero\alpha_zero_general\data'
+
 from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board
+
+
 class Coach:
     """
     This class executes the self-play + learning. It uses the functions defined
@@ -25,7 +30,7 @@ class Coach:
         self.trainExamplesHistory = []  # history of examples from args.numItersForTrainExamplesHistory latest iterations
         self.skipFirstSelfPlay = False  # can be overriden in loadTrainExamples()
 
-    def executeEpisode(self):
+    def executeEpisode(self) -> list:
         """
         This function executes one episode of self-play, starting with player 1.
         As the game is played, each turn is added as a training example to
@@ -52,32 +57,32 @@ class Coach:
 
         while True:
             episodeStep += 1
-            canonicalBoard = self.game.getCanonicalForm(board, self.curPlayer)
+            canonical_board = self.game.getCanonicalForm(board, self.curPlayer)
 
             temp = int(episodeStep < self.args.tempThreshold)
 
-            pi = self.mcts.getActionProb(canonicalBoard, temp=temp)
-            sym = self.game.getSymmetries(canonicalBoard, pi)
+            pi = self.mcts.getActionProb(canonical_board, temp=temp)
+            sym = self.game.getSymmetries(canonical_board, pi)
             for b, p in sym:
                 trainExamples.append([b, self.curPlayer, p, None])
 
             action = np.random.choice(len(pi), p=pi)
             #########################  TODO: remove after testing
-            moves_verbose.append(b_obj.verbose_game(canonicalBoard, action, no_board=True))
+            moves_verbose.append(b_obj.verbose_game(canonical_board, action, no_board=True))
             if episodeStep % 5 == 0 and episodeStep != 1 and sample_collection is True:
                 timestamp = datetime.datetime.now().strftime("%H_%M_%S")
                 np.save(
-                    fr'C:/Users/afinkels/Desktop/private/Technion/Master studies/Project in Deep Learning/Alpha-2Zero-master/Alpha-2Zero/Opponent/testing/our_board_samples/{timestamp}.npy',
-                    canonicalBoard)
+                    f'{PATH}\\{timestamp}.npy',
+                    canonical_board)
 
                 # redirect sys stdout
                 original = sys.stdout
                 sys.stdout = open(
-                    fr"C:/Users/afinkels/Desktop/private/Technion/Master studies/Project in Deep Learning/Alpha-2Zero-master/Alpha-2Zero/Opponent/testing/our_board_samples/{timestamp}.txt",
+                    f"{PATH}\\{timestamp}.txt",
                     'w')
                 # print(f"step count {b.decode_step_count()}:")
                 print('\n'.join(moves_verbose))
-                b_obj.verbose_game(canonicalBoard)
+                b_obj.verbose_game(canonical_board)
                 sys.stdout.close()
                 sys.stdout = original
             ########################
@@ -85,10 +90,10 @@ class Coach:
             # print(f"Board before: \n{board}")
             board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
             # print(f"Board after: \n{board}")
-            r = self.game.getGameEnded(board, self.curPlayer)
+            response = self.game.getGameEnded(board, self.curPlayer)
 
-            if r != 0:
-                return [(x[0], x[2], r * ((-1) ** (x[1] != self.curPlayer))) for x in trainExamples]
+            if response != 0:
+                return [(x[0], x[2], response * ((-1) ** (x[1] != self.curPlayer))) for x in trainExamples]
 
     def learn(self):
         """
@@ -117,9 +122,8 @@ class Coach:
                     # bookkeeping + plot progress
                     eps_time.update(time.time() - end)
                     end = time.time()
-                    bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(
-                        eps=eps + 1, maxeps=self.args.numEps, et=eps_time.avg,
-                        total=bar.elapsed_td, eta=bar.eta_td)
+                    bar.suffix = f'({eps+1}/{args.numEps}) Eps Time: {eps_time.avg:.3f}s ' \
+                                 f'| Total: {bar.elapsed_td:} | ETA: {bar.eta_td:}'
                     bar.next()
                 bar.finish()
 

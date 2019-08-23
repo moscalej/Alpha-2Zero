@@ -1,3 +1,4 @@
+import datetime
 import sys
 sys.path.append('..')
 from utils import *
@@ -10,6 +11,7 @@ from keras.optimizers import *
 class NMM_NNet():
     def __init__(self, game, args):
         # game params
+        self.callbacks = []
         self.board_x, self.board_y = game.getBoardSize()
         self.action_size = game.getActionSize()
         self.args = args
@@ -29,5 +31,15 @@ class NMM_NNet():
         self.v = Dense(1, activation='tanh', name='v')(s_fc2)                    # batch_size x 1
 
         self.model = Model(inputs=self.input_boards, outputs=[self.pi, self.v])
-        self.model.compile(loss=['categorical_crossentropy','mean_squared_error'], optimizer=Adam(args.lr))
+        self.model.compile(loss=['categorical_crossentropy','mean_squared_error'],
+                           optimizer=Adam(args.lr),
+                           # callbacks = self.callbacks,
+                           )
         self.model.summary()
+
+
+        def create_callbacks():
+            log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+            tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+            self.tf_cb = tensorboard_callback
+            self.callbacks.append(self.tf_cb)
