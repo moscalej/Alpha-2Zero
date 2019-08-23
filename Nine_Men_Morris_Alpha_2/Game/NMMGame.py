@@ -11,20 +11,20 @@ class MenMorris(Game):
         self.men_count = men_count
         self.actionSize = 24 * 5 * 25 + 1
 
-    def getInitBoard(self):
+    def get_init_board(self):
         # return initial board (numpy board)
         b = Board()
         return b.matrix_board
 
-    def getBoardSize(self):
+    def get_board_size(self):
         # (a,b) tuple
         return 7, 7
 
-    def getActionSize(self):
+    def get_action_size(self):
         # return number of actions
         return self.actionSize
 
-    def getNextState(self, board: np.ndarray, player: int, action: int) -> (np.ndarray, int):
+    def get_next_state(self, board: np.ndarray, player: int, action: int) -> (np.ndarray, int):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
 
@@ -35,7 +35,7 @@ class MenMorris(Game):
         # board = np.copy(b.matrix_board)
         return b.matrix_board, -player
 
-    def getValidMoves(self, board: np.ndarray, player):
+    def get_valid_moves(self, board: np.ndarray, player):
         # return a fixed size binary vector
         b = Board(board.copy())
         b.board = [b.matrix_board[b.board_map[i]] for i in range(24)]
@@ -44,7 +44,7 @@ class MenMorris(Game):
         legalMoves.extend([0 if np.sum(legalMoves) > 0 else 1])
         return legalMoves
 
-    def getGameEnded(self, board: np.ndarray, player):
+    def get_game_ended(self, board: np.ndarray, player):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
         b = Board(board.copy())
@@ -53,19 +53,19 @@ class MenMorris(Game):
             return -player
         if b.is_win(player):
             return player
-        valid_moves = self.getValidMoves(board, player)
+        valid_moves = self.get_valid_moves(board, player)
         if np.sum(valid_moves):  # game continues
             return 0
         # draw has a very little value
         return 1e-4 * player
 
-    def getCanonicalForm(self, board: np.ndarray, player):
+    def get_canonical_form(self, board: np.ndarray, player):
         # return state if player==1, else return -state if player==-1
         # TODO need to check this
         b = Board(board.copy())
         return b.cononical_board(player)
 
-    def getSymmetries(self, board: np.ndarray, pi):
+    def get_symmetries(self, board: np.ndarray, pi:float)-> list:
         # mirror, rotational
         # assert(len(pi) == self.n**2+1)  # 1 for pass
         # pi_board = np.reshape(pi[:-1], (24, 5, 25))
@@ -82,7 +82,7 @@ class MenMorris(Game):
         l = [(board, pi)]
         return l
 
-    def stringRepresentation(self, board):
+    def string_representation(self, board):
         # 8x8 numpy array (canonical board)
         return board.tostring()
 

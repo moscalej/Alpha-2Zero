@@ -12,7 +12,7 @@ class TaflGame(Game):
     def __init__(self, name):
         self.name = name
 
-    def getInitBoard(self):    
+    def get_init_board(self):
         board=Board(Tafl())
         if self.name=="Brandubh": board=Board(Brandubh())
         if self.name=="ArdRi": board=Board(ArdRi())
@@ -24,15 +24,15 @@ class TaflGame(Game):
         return board
         
 
-    def getBoardSize(self):
+    def get_board_size(self):
         # (a,b) tuple
         return (self.n, self.n)
 
-    def getActionSize(self):
+    def get_action_size(self):
         # return number of actions
         return self.n**4 
 
-    def getNextState(self, board, player, action):
+    def get_next_state(self, board, player, action):
         # if player takes action on board, return next (board,player)
         # action must be a valid move
         b = board.getCopy()
@@ -40,9 +40,9 @@ class TaflGame(Game):
         b.execute_move(move, player)
         return (b, -player)
 
-    def getValidMoves(self, board, player):
+    def get_valid_moves(self, board, player):
         # return a fixed size binary vector
-        valids = [0]*self.getActionSize()
+        valids = [0]*self.get_action_size()
         b = board.getCopy()
         legalMoves = b.get_legal_moves(player)
         if len(legalMoves)==0:
@@ -52,17 +52,17 @@ class TaflGame(Game):
             valids[x1+y1*self.n+x2*self.n**2+y2*self.n**3]=1
         return np.array(valids)
 
-    def getGameEnded(self, board, player):
+    def get_game_ended(self, board, player):
         # return 0 if not ended, if player 1 won, -1 if player 1 lost
         return board.done*player
 
-    def getCanonicalForm(self, board, player):
+    def get_canonical_form(self, board, player):
         # return state if player==1, else return -state if player==-1
         b = board.getCopy()
         #for p in b.pieces: p[2]=p[2]*player
         return b
 
-    def getSymmetries(self, board, pi):
+    def get_symmetries(self, board, pi):
         # mirror, rotational
         assert(len(pi) == self.n**2)  
         pi_board = np.reshape(pi[:-1], (self.n, self.n))
@@ -78,7 +78,7 @@ class TaflGame(Game):
                 l += [(newB, list(newPi.ravel()) + [pi[-1]])]
         return l
 
-    def stringRepresentation(self, board):
+    def string_representation(self, board):
         # numpy array (canonical board)
         return board.tostring()
 

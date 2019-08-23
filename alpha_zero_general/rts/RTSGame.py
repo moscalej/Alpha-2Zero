@@ -15,7 +15,7 @@ from rts.src.config import NUM_ENCODERS, NUM_ACTS, P_NAME_IDX, A_TYPE_IDX, TIME_
 RTSGame.pyefined rules for RTS game TD2020
 Includes: 
 - init - contains board configuration
-- getGameEnded - contains end game checking
+- get_game_ended - contains end game checking
 """
 
 

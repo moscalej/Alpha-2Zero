@@ -111,7 +111,7 @@ def NN_player_wrapper(name='TEST-rawest-TFR'):
         # the step count would be wrong for the initial 4 steps, but it doesn't effect the stage
         step_count = b.decode_step_count(our_state) + b.count_offset
         isStage2 = step_count >= 18
-        pi_mask = np.array(g.getValidMoves(our_state, 1))
+        pi_mask = np.array(g.get_valid_moves(our_state, 1))
         their_state_ = state_translator(our_state)
         their_state = process_game_line(their_state_)
         TO, FROM, REMOVE = their_player(their_state)

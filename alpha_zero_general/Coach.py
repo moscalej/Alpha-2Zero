@@ -29,8 +29,9 @@ class Coach:
         self.mcts = MCTS(self.game, self.nnet, self.args)
         self.trainExamplesHistory = []  # history of examples from args.numItersForTrainExamplesHistory latest iterations
         self.skipFirstSelfPlay = False  # can be overriden in loadTrainExamples()
+        self.curPlayer = None
 
-    def executeEpisode(self) -> list:
+    def execute_episode(self) -> list:
         """
         This function executes one episode of self-play, starting with player 1.
         As the game is played, each turn is added as a training example to
@@ -42,58 +43,56 @@ class Coach:
         uses temp=0.
 
         Returns:
-            trainExamples: a list of examples of the form (canonicalBoard,pi,v)
+            trainExamples: a list of examples of the form (canonical_board,pi,v)
                            pi is the MCTS informed policy vector, v is +1 if
                            the player eventually won the game, else -1.
         """
-        trainExamples = []
-        board = self.game.getInitBoard()
+        train_examples = []
+        board = self.game.get_init_board()
         self.curPlayer = 1
-        episodeStep = 0
+        episode_step = 0
 
         sample_collection = True  # REMOVE
         moves_verbose = []  # REMOVE
         b_obj = Board()  # REMOVE
 
+        def winner(outcome, player, current) -> int:
+            return outcome * ((-1) ** (player != current))
+
         while True:
-            episodeStep += 1
-            canonical_board = self.game.getCanonicalForm(board, self.curPlayer)
+            episode_step += 1
+            canonical_board = self.game.get_canonical_form(board, self.curPlayer)
 
-            temp = int(episodeStep < self.args.tempThreshold)
+            temp = int(episode_step < self.args.tempThreshold)
 
-            pi = self.mcts.getActionProb(canonical_board, temp=temp)
-            sym = self.game.getSymmetries(canonical_board, pi)
-            for b, p in sym:
-                trainExamples.append([b, self.curPlayer, p, None])
+            pi = self.mcts.get_action_prob(canonical_board, temp=temp)
+            sym = self.game.get_symmetries(canonical_board, pi)
+            for board, pi_ in sym:
+                train_examples.append([board, self.curPlayer, pi_, None])
 
             action = np.random.choice(len(pi), p=pi)
-            #########################  TODO: remove after testing
-            moves_verbose.append(b_obj.verbose_game(canonical_board, action, no_board=True))
-            if episodeStep % 5 == 0 and episodeStep != 1 and sample_collection is True:
-                timestamp = datetime.datetime.now().strftime("%H_%M_%S")
-                np.save(
-                    f'{PATH}\\{timestamp}.npy',
-                    canonical_board)
 
-                # redirect sys stdout
+            #########################  TODO: remove after testing
+            # action = np.argmax(pi)
+            moves_verbose.append(b_obj.verbose_game(canonical_board, action, no_board=True))
+            if episode_step % 5 == 0 and episode_step != 1 and sample_collection is True:
+                timestamp = datetime.datetime.now().strftime("%H_%M_%S")
+                np.save(f'{PATH}\\{timestamp}.npy', canonical_board)
                 original = sys.stdout
-                sys.stdout = open(
-                    f"{PATH}\\{timestamp}.txt",
-                    'w')
+                sys.stdout = open(f"{PATH}\\{timestamp}.txt", 'w')
                 # print(f"step count {b.decode_step_count()}:")
                 print('\n'.join(moves_verbose))
                 b_obj.verbose_game(canonical_board)
                 sys.stdout.close()
                 sys.stdout = original
             ########################
-            # print(f"Player{self.curPlayer} is playing action: {action}")
-            # print(f"Board before: \n{board}")
-            board, self.curPlayer = self.game.getNextState(board, self.curPlayer, action)
-            # print(f"Board after: \n{board}")
-            response = self.game.getGameEnded(board, self.curPlayer)
+            board, self.curPlayer = self.game.get_next_state(board, self.curPlayer, action)
+
+            response = self.game.get_game_ended(board, self.curPlayer)
 
             if response != 0:
-                return [(x[0], x[2], response * ((-1) ** (x[1] != self.curPlayer))) for x in trainExamples]
+                return [(board, pi, winner(response, player, self.curPlayer))
+                        for board, player, pi, _ in train_examples]
 
     def learn(self):
         """
@@ -109,26 +108,26 @@ class Coach:
             print('------ITER ' + str(i) + '------')
             # examples of the iteration
             if not self.skipFirstSelfPlay or i > 1:
-                iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
+                iteration_train_examples = deque([], maxlen=self.args.maxlenOfQueue)
 
                 eps_time = AverageMeter()
                 bar = Bar('Self Play', max=self.args.numEps)
                 end = time.time()
 
                 for eps in range(self.args.numEps):
-                    self.mcts = MCTS(self.game, self.nnet, self.args)  # reset search tree
-                    iterationTrainExamples += self.executeEpisode()
+                    self.mcts = MCTS(self.game, self.nnet, self.args)
+                    iteration_train_examples += self.execute_episode()
 
                     # bookkeeping + plot progress
                     eps_time.update(time.time() - end)
                     end = time.time()
-                    bar.suffix = f'({eps+1}/{args.numEps}) Eps Time: {eps_time.avg:.3f}s ' \
+                    bar.suffix = f'({eps + 1}/{self.args.numEps}) Eps Time: {eps_time.avg:.3f}s ' \
                                  f'| Total: {bar.elapsed_td:} | ETA: {bar.eta_td:}'
                     bar.next()
                 bar.finish()
 
                 # save the iteration examples to the history 
-                self.trainExamplesHistory.append(iterationTrainExamples)
+                self.trainExamplesHistory.append(iteration_train_examples)
 
             if len(self.trainExamplesHistory) > self.args.numItersForTrainExamplesHistory:
                 print("len(trainExamplesHistory) =", len(self.trainExamplesHistory),
@@ -139,26 +138,27 @@ class Coach:
             self.saveTrainExamples(i - 1)
 
             # shuffle examples before training
-            trainExamples = []
+            train_examples = []
             for e in self.trainExamplesHistory:
-                trainExamples.extend(e)
-            shuffle(trainExamples)
+                train_examples.extend(e)
+            shuffle(train_examples)
 
             # training new network, keeping a copy of the old one
             self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             self.pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             pmcts = MCTS(self.game, self.pnet, self.args)
 
-            self.nnet.train(trainExamples)
+            self.nnet.train(train_examples)
             nmcts = MCTS(self.game, self.nnet, self.args)
 
             print('PITTING AGAINST PREVIOUS VERSION')
-            arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0, )),
-                          lambda x: np.argmax(nmcts.getActionProb(x, temp=0, )), self.game)
+            arena = Arena(lambda x: np.argmax(pmcts.get_action_prob(x, temp=0, )),
+                          lambda x: np.argmax(nmcts.get_action_prob(x, temp=0, )), self.game)
             pwins, nwins, draws = arena.playGames(self.args.arenaCompare)
 
             print('NEW/PREV WINS : %d / %d ; DRAWS : %d' % (nwins, pwins, draws))
             # if pwins + nwins == 0 or float(nwins) / (pwins + nwins) < self.args.updateThreshold:
+
             if False:
                 print('REJECTING NEW MODEL')
                 self.nnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
@@ -168,7 +168,7 @@ class Coach:
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
 
     def getCheckpointFile(self, iteration):
-        return 'checkpoint_' + str(iteration) + '.pth.tar'
+        return f'checkpoint_{ iteration}.pth.tar'
 
     def saveTrainExamples(self, iteration):
         folder = self.args.checkpoint

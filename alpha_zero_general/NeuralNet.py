@@ -1,3 +1,5 @@
+import numpy as np
+
 class NeuralNet:
     """
     This class specifies the base NeuralNet class. To define your own neural
@@ -24,14 +26,14 @@ class NeuralNet:
         """
         pass
 
-    def predict(self, board):
+    def predict(self, board) -> (np.ndarray, float):
         """
         Input:
             board: current board in its canonical form.
 
         Returns:
             pi: a policy vector for the current board- a numpy array of length
-                game.getActionSize
+                game.get_action_size
             v: a float in [-1,1] that gives the value of the current board
         """
         pass

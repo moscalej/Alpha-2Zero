@@ -7,6 +7,8 @@ import numpy as np
 import math
 import sys
 
+from alpha_zero_general.Game import Game
+
 sys.path.append('../..')
 from utils import *
 from NeuralNet import NeuralNet
@@ -26,10 +28,10 @@ args = dotdict({
 
 
 class NNetWrapper(NeuralNet):
-    def __init__(self, game):
+    def __init__(self, game: Game):
         self.nnet = onnet(game, args)
-        self.board_x, self.board_y = game.getBoardSize()
-        self.action_size = game.getActionSize()
+        self.board_x, self.board_y = game.get_board_size()
+        self.action_size = game.get_action_size()
 
     def train(self, examples):
         """

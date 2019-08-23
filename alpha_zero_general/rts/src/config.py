@@ -361,7 +361,7 @@ class Configuration:
                 # how many turns until game end - this gets reduced when each turn is executed
                 self.TIMEOUT = timeout
             else:
-                # sets initial tick to 0 and then in getGameEnded it gets incremented unitl number 8191
+                # sets initial tick to 0 and then in get_game_ended it gets incremented unitl number 8191
                 self.TIMEOUT = 0
             # ##################################
             # ########## ATTACKING #############
@@ -474,7 +474,7 @@ class Configuration:
                 n1.load_checkpoint('.\\..\\temp\\', player_model_file)
                 args1 = dotdict(player_config or {'numMCTSSims': 2, 'cpuct': 1.0})
                 mcts1 = MCTS(g, n1, args1)
-                self.play = lambda x: np.argmax(mcts1.getActionProb(x, temp=0))
+                self.play = lambda x: np.argmax(mcts1.get_action_prob(x, temp=0))
 
     class _LearnArgs:
         def __init__(self,
