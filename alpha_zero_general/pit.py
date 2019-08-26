@@ -1,37 +1,41 @@
-import Arena
-from MCTS import MCTS
-from othello.OthelloGame import OthelloGame, display
-from othello.OthelloPlayers import *
-from othello.pytorch.NNet import NNetWrapper as NNet
-
-import numpy as np
-from utils import *
 
 """
 use this script to play any two agents against each other, or play manually with
 any agent.
 """
+from MCTS import MCTS
+from Arena import Arena
+from Nine_Men_Morris_Alpha_2.Game.NMMGame import MenMorris as Game
+from Nine_Men_Morris_Alpha_2.keras.NNet import NNetWrapper as NeuralNetwork
+import numpy as np
+args = dotdict({
+    'numIters': 1000,
+    'numEps': 400,
+    'tempThreshold': 15,
+    'updateThreshold': 0.6,
+    'maxlenOfQueue': 200000,
+    'numMCTSSims': 24,
+    'arenaCompare': 40,
+    'cpuct': 10,
+    'epochs': 40,
+    'checkpoint': './temp/',
+    'load_model': False,
+    'load_folder_file': ('.\\temp', 'checkpoint_65.pth.tar'),
+    'load_folder_Sample': ('.\\temp', 'checkpoint_65.pth.tar'),
+    'numItersForTrainExamplesHistory': 20,
+})
 
-g = OthelloGame(6)
 
-# all players
-rp = RandomPlayer(g).play
-gp = GreedyOthelloPlayer(g).play
-hp = HumanOthelloPlayer(g).play
-
-# neural_network players
-n1 = NNet(g)
-n1.load_checkpoint('./pretrained_models/othello/pytorch/','6x100x25_best.pth.tar')
-args1 = dotdict({'numMCTSSims': 50, 'cpuct':1.0})
-mcts1 = MCTS(g, n1, args1)
-n1p = lambda x: np.argmax(mcts1.get_action_prob(x, temp=0))
+game = Game(men_count=9)
+neural_network = NeuralNetwork(game)
+neural_network.nnet.load_checkpoint(folder=args.checkpoint, filename='temp.pth.tar')
+nmcts = MCTS(game, neural_network.nnet, args)
 
 
-#n2 = NNet(g)
-#n2.load_checkpoint('/dev/8x50x25/','best.pth.tar')
-#args2 = dotdict({'numMCTSSims': 25, 'cpuct':1.0})
-#mcts2 = MCTS(g, n2, args2)
-#n2p = lambda x: np.argmax(mcts2.get_action_prob(x, temp=0))
+print('PITTING AGAINST PREVIOUS VERSION')
+arena = Arena(lambda x: np.argmax(nmcts.get_action_prob(x, temp=0, )),
+              lambda x: np.argmax(nmcts.get_action_prob(x, temp=0, )), game)
 
-arena = Arena.Arena(n1p, hp, g, display=display)
+
+
 print(arena.playGames(2, verbose=True))

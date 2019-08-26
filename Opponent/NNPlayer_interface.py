@@ -1,6 +1,6 @@
 import numpy as np
-from main_play import choose, init
-from dataprocessing import *
+from Opponent.main_play import choose, init
+from Opponent.dataprocessing import *
 from Nine_Men_Morris_Alpha_2.Game import NMMLogic, NMMGame
 
 

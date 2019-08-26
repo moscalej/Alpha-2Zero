@@ -10,9 +10,9 @@ import sys
 import time
 import numpy
 
-from dataprocessing import (load_expanded_states_dataset, load_states_dataset,
+from Opponent.dataprocessing import (load_expanded_states_dataset, load_states_dataset,
                             process_state_binary)
-from legality import get_legalities, near
+from Opponent.legality import get_legalities, near
 
 # load the states of a database and measures the number of legal moves for each
 # state and the number of moves in which each move is legal
@@ -277,7 +277,7 @@ if __name__ == '__main__':
               expanded == "TRUE"):
             kwargs['expanded'] = True
         else:
-            print usage
+            print (usage)
             sys.exit(0)
         
         main(**kwargs)

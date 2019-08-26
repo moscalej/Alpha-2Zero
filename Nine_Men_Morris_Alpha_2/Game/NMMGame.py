@@ -63,7 +63,7 @@ class MenMorris(Game):
         # return state if player==1, else return -state if player==-1
         # TODO need to check this
         b = Board(board.copy())
-        return b.cononical_board(player)
+        return b.canonical_board(player)
 
     def get_symmetries(self, board: np.ndarray, pi:float)-> list:
         # mirror, rotational

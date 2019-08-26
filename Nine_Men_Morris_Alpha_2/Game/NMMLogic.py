@@ -23,6 +23,7 @@ class Board(Base_mill):
     # list of all 8 directions on the board, as (x,y) offsets
     def __init__(self, matrix_b=None):
         super(Board, self).__init__()
+
         if matrix_b is not None:
             self.matrix_board = matrix_b
 
@@ -159,7 +160,7 @@ class Board(Base_mill):
         """
         return self.decode_step_count() == 18 - self.count_offset
 
-    def cononical_board(self, player):
+    def canonical_board(self, player):
         step = self.decode_step_count()
         self.matrix_board *= -1  # TODO: originaly it was *= player, validate
         self.encode_step_count(step)
@@ -188,11 +189,11 @@ class Board(Base_mill):
             describe_moves.append(f"and Remove from {self.board_map[remove]}")
 
     def verbose_game(self, board, action_code=None, no_board=False):
-        withAction = action_code is not None
-        set = []
+        with_action = action_code is not None
+        set_map = []
         removed = []
-        legal_inds = list(self.board_map.values())
-        if withAction:
+        legal_ind = list(self.board_map.values())
+        if with_action:
             if action_code == 24 * 5 * 25:
                 print(f"game ended action code: {action_code}")
                 return
@@ -203,11 +204,11 @@ class Board(Base_mill):
 
             if action == 4:
                 describe_moves.append(f"Set a piece in {self.board_map[piece]}")
-                set.append(self.board_map[piece])
+                set_map.append(self.board_map[piece])
 
             else:
                 removed.append(self.board_map[piece])
-                set.append(self.board_map[self.adjacent[piece][action]])
+                set_map.append(self.board_map[self.adjacent[piece][action]])
                 describe_moves.append(f"Move from {self.board_map[piece]} {action_types[action]}"
                                       f" to {self.board_map[self.adjacent[piece][action]]}")
 
@@ -227,7 +228,7 @@ class Board(Base_mill):
             next_board = board
 
         def getColor(x_, y_, player):
-            if (x_, y_) not in legal_inds:
+            if (x_, y_) not in legal_ind:
                 return 'blue', ' '
             if player == 1:
                 s = 'X'
@@ -238,7 +239,7 @@ class Board(Base_mill):
             else:
                 color = 'white'
                 s = '-'
-            if (x_, y_) in set:
+            if (x_, y_) in set_map:
                 s = 'X'
                 color = 'yellow'
             if (x_, y_) in removed:

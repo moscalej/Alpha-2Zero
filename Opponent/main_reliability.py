@@ -8,7 +8,7 @@ __email__ = "a.galassi@unibo.it"
 
 import sys
 
-from testing import test_networks_reliability
+from Opponent.testing import test_networks_reliability
 
 def main(datasetname='DATASET.mock.txt',
          expanded=False,
@@ -40,7 +40,7 @@ if __name__ == '__main__':
               expanded == "TRUE"):
             kwargs['expanded'] = True
         else:
-            print usage
+            print (usage)
             sys.exit(0)
         kwargs['name'] = sys.argv[3]
         main(**kwargs)
