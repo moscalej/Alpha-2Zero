@@ -13,11 +13,10 @@ import lasagne
 import sys
 import socket
 
-from dataprocessing import (process_state_binary, add_CHOICE_binary_raw,
+from Opponent.dataprocessing import (process_state_binary, add_CHOICE_binary_raw,
                             process_game_line)
-from legality import get_legalities
-from networks import load_net
-import pydot_ng as pydot
+from Opponent.legality import get_legalities
+from Opponent.networks import load_net
 
 illegalTO = 0
 illegalFROM = 0
@@ -38,7 +37,7 @@ def main(netname='TEST-rawest-TFR', team="white"):
 
 
 def init(name):
-    base = r'C:\Users\afinkels\Desktop\private\Technion\Master studies\Project in Deep Learning\Alpha-2Zero-master\Alpha-2Zero\Opponent'
+    base = r'C:\Users\amoscoso\Documents\Technion\deeplearning\Alpha-2Zero\Opponent'
     name = os.path.join(base, r'trained_networks', 'TFR', name)  # CHANGED
     inputTO, TOnetwork, numTO, dataformat = load_net(name + "_TO")
 

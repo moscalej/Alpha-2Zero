@@ -6,7 +6,7 @@ __license__ = "MIT"
 __version__ = "1.1.1"
 __email__ = "a.galassi@unibo.it"
 
-import Opponent.lasagne
+import lasagne
 import pickle
 import numpy
 import theano

@@ -2,7 +2,7 @@ import math
 import numpy as np
 from alpha_zero_general.Game import Game
 from alpha_zero_general.NeuralNet import NeuralNet
-from scipy.special import softmax
+# from scipy.special import softmax
 
 EPS = 1e-8
 
