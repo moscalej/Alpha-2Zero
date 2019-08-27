@@ -517,6 +517,7 @@ def get_legalities(TO_choice, FROM_choice, REMOVE_choice,
         TO_self_leg = None
 
     if FROM_choice is not None:
+
         FROM_self_leg = FROM_self_legality_test(FROM_choice, X_test, data_format)
     else:
         FROM_self_leg = None

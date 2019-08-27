@@ -29,7 +29,7 @@ def translate_(i):
     return i - 1
 
 
-def state_translator(board: np.array):
+def state_translator(board: np.array) -> str:
     """
     # return their_state representation
     :param board:
@@ -53,7 +53,7 @@ def state_translator(board: np.array):
         # if step_count odd, mine player is supposed to have 1 less piece
         mine_expected = int((step_count - (step_count % 2)) / 2)
         enemy_expected = np.ceil(step_count / 2)
-        remaining = f'{init_pieces_n - mine_expected}' + f'{int(init_pieces_n - enemy_expected)}'
+        remaining = f'{init_pieces_n - mine_expected}{int(init_pieces_n - enemy_expected)}'
 
     their_board = ['O'] * 24 + [remaining] + [str(my_piece_count) + str(enemy_piece_count)]
     for i in range(24):

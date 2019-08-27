@@ -158,6 +158,8 @@ def choose(TOnet, FROMnet, REMOVEnet, state, data_format):
             legal = legalities[8]
         elif orderc[2] == 'R':
             legal = legalities[5]
+            if propchoice ==0:
+                legal[0] =1 # TODO remove debug
 
         if (legal[0] == 0):
             SECONDprob[0][SECONDchoice[0]] = -1
@@ -192,6 +194,7 @@ def choose(TOnet, FROMnet, REMOVEnet, state, data_format):
             THIRDprob[0][THIRDchoice[0]] = -1
             print("\t\t\tIllegal REMOVE choice, retry")
             illegal[2] += 1
+            correct =True
         else:
             correct = True
 
