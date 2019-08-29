@@ -44,8 +44,8 @@ class Arena():
         while self.game.get_game_ended(board, curPlayer) == 0:
             it += 1
             if verbose:
-                assert (self.display)
-                print("Turn ", str(it), "Player ", str(curPlayer))
+                assert self.display
+                print(f"Turn {it}, Player  {curPlayer}")
                 self.display(board)
             action = players[curPlayer + 1](self.game.get_canonical_form(board, curPlayer))
 
@@ -99,6 +99,7 @@ class Arena():
                                                                                                        total=bar.elapsed_td,
                                                                                                        eta=bar.eta_td)
             bar.next()
+
         print(f'player {1} state--> won: {oneWon} loss: {twoWon}')
         self.player1, self.player2 = self.player2, self.player1
 

@@ -56,8 +56,18 @@ class Coach:
         moves_verbose = []  # REMOVE
         b_obj = Board()  # REMOVE
 
-        def winner(outcome, player, current) -> int:
-            return outcome * ((-1) ** (player != current))
+        def winner(outcome: int, player: int, current: int) -> int:
+            """
+            Returns the winner
+            :param outcome: outcome = 1 player == current --> -1
+            :param player:
+            :param current:
+            :type current:
+            :return:
+            :rtype:
+            """
+            val=  outcome * ((-1) ** (player != current))
+            return val
 
         while True:
             episode_step += 1
@@ -67,33 +77,49 @@ class Coach:
 
             pi = self.mcts.get_action_prob(canonical_board, temp=temp)
             sym = self.game.get_symmetries(canonical_board, pi)
-            for board, pi_ in sym:
-                train_examples.append([board, self.curPlayer, pi_, None])
+            for board_, pi_ in sym:
+                train_examples.append([board_, self.curPlayer, pi_, None])
 
             action = np.random.choice(len(pi), p=pi)
 
             #########################  TODO: remove after testing
-            # action = np.argmax(pi)
-            moves_verbose.append(b_obj.verbose_game(canonical_board, action, no_board=True))
-            if episode_step % 5 == 0 and episode_step != 1 and sample_collection is True:
-                timestamp = datetime.datetime.now().strftime("%H_%M_%S")
-                np.save(f'{PATH}\\{timestamp}.npy', canonical_board)
-                original = sys.stdout
-                sys.stdout = open(f"{PATH}\\{timestamp}.txt", 'w')
-                # print(f"step count {b.decode_step_count()}:")
-                print('\n'.join(moves_verbose))
-                b_obj.verbose_game(canonical_board)
-                sys.stdout.close()
-                sys.stdout = original
-            ########################
-            board, self.curPlayer = self.game.get_next_state(board, self.curPlayer, action)
+            # # action = np.argmax(pi)
+            # moves_verbose.append(b_obj.verbose_game(canonical_board, action, no_board=True))
+            # if episode_step % 5 == 0 and episode_step != 1 and sample_collection is True:
+            #     timestamp = datetime.datetime.now().strftime("%H_%M_%S")
+            #     np.save(f'{PATH}\\{timestamp}.npy', canonical_board)
+            #     original = sys.stdout
+            #     sys.stdout = open(f"{PATH}\\{timestamp}.txt", 'w')
+            #     # print(f"step count {b.decode_step_count()}:")
+            #     print('\n'.join(moves_verbose))
+            #     b_obj.verbose_game(canonical_board)
+            #     sys.stdout.close()
+            #     sys.stdout = original
+            # ########################
+            # b_1 = Board(canonical_board)
+            # b_1.verbose_game(canonical_board,action)
+            new_board, new_player = self.game.get_next_state(board, self.curPlayer, action)
+            # b_2= Board(new_board)
+            # b_2.verbose_game(new_board)
 
-            response = self.game.get_game_ended(board, self.curPlayer)
+            response = self.game.get_game_ended(new_board, new_player)
 
             if response != 0:
-                return [(board, pi, winner(response, player, self.curPlayer))
-                        for board, player, pi, _ in train_examples]
-
+                last_player = new_player
+                print("Simulated game end")
+                print(f"Number of iterations was {episode_step}")
+                print(f"Last move was done by {self.curPlayer}")
+                winer = {
+                    (1, 1) : 'player 1',
+                    (1,-1) : 'player -1',
+                    (-1,1) : 'player 1',
+                    (-1,-1) : 'player -1',
+                }[last_player,response]
+                print(f"This move make the winner to be{winer}")
+                return [(board_m, pi_, winner(response, player_, new_player))
+                        for board_m, player_, pi_, _ in train_examples]
+            self.curPlayer = new_player
+            board = new_board
     def learn(self):
         """
         Performs numIters iterations with numEps episodes of self-play in each
@@ -168,7 +194,7 @@ class Coach:
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
 
     def getCheckpointFile(self, iteration):
-        return f'checkpoint_{ iteration}.pth.tar'
+        return f'checkpoint_{iteration}.pth.tar'
 
     def saveTrainExamples(self, iteration):
         folder = self.args.checkpoint

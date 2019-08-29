@@ -84,8 +84,12 @@ def action_translator(is_stage2, TOc, FROMc, REMOVEc):
             a[2] = get_a(REMOVEc)
     elif min(FROMc, TOc) != 0:
         # move piece
-        from_ = get_a(FROMc)
-        to_ = get_a(TOc)
+
+        # from_ = get_a(FROMc)
+        # to_ = get_a(TOc)
+        from_ = get_a(TOc)
+        to_ = get_a(FROMc)
+        a[0] = from_
         try:
             a[1] = board_obj.adjacent[from_].index(to_)
         except:

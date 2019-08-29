@@ -156,12 +156,14 @@ def choose(TOnet, FROMnet, REMOVEnet, state, data_format):
             legal = legalities[9]
         elif orderc[2] == 'F':
             legal = legalities[8]
+            legal[0] =1 # TODO remove debug
         elif orderc[2] == 'R':
             legal = legalities[5]
             if propchoice ==0:
                 legal[0] =1 # TODO remove debug
 
-        if (legal[0] == 0):
+        # if (legal[0] == 0):
+        if False:
             SECONDprob[0][SECONDchoice[0]] = -1
             print("\t\t\tIllegal FROM choice, retry")
             illegal[1] += 1
@@ -190,7 +192,8 @@ def choose(TOnet, FROMnet, REMOVEnet, state, data_format):
                                     vec_4_leg[REMOVEnet[1]],
                                     SECONDstate)[7]
 
-        if (legalities[0] == 0):
+        # if (legalities[0] == 0):
+        if False:
             THIRDprob[0][THIRDchoice[0]] = -1
             print("\t\t\tIllegal REMOVE choice, retry")
             illegal[2] += 1

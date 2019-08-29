@@ -1,4 +1,3 @@
-
 """
 use this script to play any two agents against each other, or play manually with
 any agent.
@@ -22,15 +21,14 @@ args = dotdict({
     'maxlenOfQueue': 200000,
     'numMCTSSims': 24,
     'arenaCompare': 40,
-    'cpuct': 10,
+    'cpuct': 0.07,
     'epochs': 40,
     'checkpoint': r'C:\Users\amoscoso\Documents\Technion\deeplearning\Alpha-2Zero\alpha_zero_general\temp',
     'load_model': False,
-    'load_folder_file': ('.\\temp', 'checkpoint_65.pth.tar'),
-    'load_folder_Sample': ('.\\temp', 'checkpoint_65.pth.tar'),
+    'load_folder_file': ('.\\temp', 'checkpoint_1.pth.tar'),
+    'load_folder_Sample': ('.\\temp', 'checkpoint_1.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
 })
-
 
 game = Game(men_count=9)
 neural_network = NeuralNetwork(game)
@@ -41,8 +39,6 @@ other_player = NN_player_wrapper()
 #
 print('Let the fight Begin')
 arena = Arena(lambda x: np.argmax(our_player.get_action_prob(x)),
-              other_player, game,lambda x : Board(x).verbose_game(x))
-
-
+              other_player, game, lambda x: Board(x).verbose_game(x))
 
 print(arena.playGames(2, verbose=True))

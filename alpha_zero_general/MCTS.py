@@ -2,6 +2,8 @@ import math
 import numpy as np
 from alpha_zero_general.Game import Game
 from alpha_zero_general.NeuralNet import NeuralNet
+from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board  # todo remove after debug
+
 # from scipy.special import softmax
 
 EPS = 1e-8
@@ -25,7 +27,7 @@ class MCTS():
         self.Es = {}  # stores game.get_game_ended ended for board s
         self.Vs = {}  # stores game.get_valid_moves for board s
 
-    def get_action_prob(self, canonical_board, temp=1) -> np.ndarray:
+    def get_action_prob(self, canonical_board: np.ndarray, temp=1) -> np.ndarray:
         """
         This function performs numMCTSSims simulations of MCTS starting from
         canonical_board.
@@ -34,9 +36,11 @@ class MCTS():
             probs: a policy vector where the probability of the ith action is
                    proportional to Nsa[(s,a)]**(1./temp)
         """
+        b = Board(canonical_board)
+        debug = b.decode_step_count()
         for i in range(self.args.numMCTSSims):
-            self.branch_mem = {}  # TODO
-            self.search(canonical_board)
+            self.branch_mem = {'deep': 0}  # TODO
+            self.search(canonical_board.copy())
 
         s = self.game.string_representation(canonical_board)
         counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.get_action_size())]
@@ -75,85 +79,117 @@ class MCTS():
             v: the negative of the value of the current canonical_board
         """
 
-        s = self.game.string_representation(canonical_board)
+        state = self.game.string_representation(canonical_board)
+        self.branch_mem['deep'] += 1
+        if state not in self.branch_mem:
+            self.branch_mem[state] = 1
+        elif self.branch_mem['deep'] > 100:
+            return - 1e-4
 
-        if s not in self.Es:
-            self.Es[s] = self.game.get_game_ended(canonical_board, 1)
-        if self.Es[s] != 0:
-            # terminal node
-            return -self.Es[s]
+        else:
+            self.branch_mem[state] += 1
+            # return - 1
+        if state not in self.Es:
+            # checks if the game has ended
+            # 0  Means the game still continues
+            # 1 means this scope has won the game
+            # -1  means this scope has loose the game
+            self.Es[state] = self.game.get_game_ended(canonical_board, 1)
 
-        if s not in self.Ps:  # policy state
+        if self.Es[state] != 0:
+            # This is a End game node the value for the upper
+
+            # scope will be the negative of this one
+            # print(f'Monte Carlo find a winner and is :{self.Es[state]}')
+            return -self.Es[state]
+
+
+        if state not in self.Ps:  # policy state meaning we did not evaluate this before
 
             # leaf node
-            self.Ps[s], v = self.nnet.predict(canonical_board)
-            t = max(self.Ps[s])
+            self.Ps[state], v_network = self.nnet.predict(canonical_board)
+            t = max(self.Ps[state])
             valids = self.game.get_valid_moves(canonical_board, 1)
-            self.Ps[s] = self.Ps[s] * valids  # masking invalid moves
-            sum_Ps_s = np.sum(self.Ps[s])
+            self.Ps[state] = self.Ps[state] * valids  # masking invalid moves
+            sum_Ps_s = np.sum(self.Ps[state])
 
             if sum_Ps_s > 0:
-                self.Ps[s] /= sum_Ps_s  # renormalize
+                self.Ps[state] /= sum_Ps_s  # renormalize
             else:
                 # if all valid moves were masked make all valid moves equally probable
-                # NB! All valid moves may be masked if either your NNet architecture is insufficient or you've get overfitting or something else.
-                # If you have got dozens or hundreds of these messages you should pay attention to your NNet and/or training process.   
+                # NB! All valid moves may be masked if either your NNet architecture is
+                # insufficient or you've get overfitting or something else.
+                # If you have got dozens or hundreds of these messages you should pay
+                # attention to your NNet and/or training process.
                 print("All valid moves were masked, do workaround.")
-                self.Ps[s] = self.Ps[s] + valids
-                self.Ps[s] /= np.sum(self.Ps[s])
+                self.Ps[state] = self.Ps[state] + valids
+                self.Ps[state] /= np.sum(self.Ps[state])
 
-            self.Vs[s] = valids
-            self.Ns[s] = 0
-            return -v
+            self.Vs[state] = valids
+            self.Ns[state] = 0
+            self.branch_mem["end"] = 1
+            return -v_network[0]
 
-        valids = self.Vs[s]
+        valids = self.Vs[state]
         cur_best = -float('inf')
         best_act = -1
 
         # pick the action with the highest upper confidence bound
-        for a in range(self.game.get_action_size()):
-            if valids[a]:
-                if (s, a) in self.Qsa:
+        for action in range(self.game.get_action_size()):
+            if valids[action]:
+                if (state, action) in self.Qsa:
                     # This provides some exploration if Nsa is small then u will be bigger --> explore less
-                    u = self.Qsa[(s, a)] + self.args.cpuct * self.Ps[s][a] * math.sqrt(self.Ns[s]) / (
-                            1 + self.Nsa[(s, a)])
+                    Qsa = self.Qsa[(state, action)]
+                    Ps = self.Ps[state][action]
+                    Ns = self.Ns[state]
+                    Nsa = self.Nsa[(state, action)]
+                    next_s, next_player = self.game.get_next_state(canonical_board, 1, action)
+                    next_s = self.game.get_canonical_form(next_s, next_player)
+                    next_string = self.game.string_representation(next_s)
+                    if next_string in self.branch_mem:
+                        u = Qsa + self.args.cpuct * Ps * math.sqrt(Ns) / (1 + Nsa + self.branch_mem[next_string]**2)
+                    else:
+                        u = Qsa + self.args.cpuct * Ps * math.sqrt(Ns) / (1 + Nsa )
                 else:
-                    u = self.args.cpuct * self.Ps[s][a] * math.sqrt(self.Ns[s] + EPS)  # Q = 0 ?
+                    Ps = self.Ps[state][action]
+                    Ns = self.Ns[state]
+                    u = self.args.cpuct * Ps * math.sqrt(Ns + EPS)  # Q = 0 ?
 
                 if u > cur_best:
                     cur_best = u
-                    best_act = a
+                    best_act = action
 
-        a = best_act
+        action = best_act
 
         # <debug>
         if verbose:
             b = self.game.get_board_obj(canonical_board)
             print(f"Player1 step {b.decode_step_count()}:")
-            b.verbose_game(canonical_board, a)
+            b.verbose_game(canonical_board, action)
         # <\debug>
 
-        next_s, next_player = self.game.get_next_state(canonical_board, 1, a)
+        next_s, next_player = self.game.get_next_state(canonical_board, 1, action)
         next_s = self.game.get_canonical_form(next_s, next_player)
         try:
-            v = self.search(next_s)
+            next_s_string = self.game.string_representation(next_s)
+            v = self.search(next_s)  # a
 
         except RecursionError:
             print("recursion")
-            t = np.array(self.Ps[s])
+            t = np.array(self.Ps[state])
             print(f"np.sum(self.Ps[s]){np.sum(t != 0)}")
             print(f'Values are : {t[t != 0]}')
-            self.Es[s] != 1e-4
+            self.Es[state] != 1e-4
             return 0
 
-        if (s, a) in self.Qsa:  # if (s,a) exists, update, otherwise, set
-            self.Qsa[(s, a)] = (self.Nsa[(s, a)] * self.Qsa[(s, a)] + v) / (self.Nsa[(s, a)] + 1)
-            self.Nsa[(s, a)] += 1
+        if (state, action) in self.Qsa:  # if (s,a) exists, update, otherwise, set
+            self.Qsa[(state, action)] = (self.Nsa[(state, action)] * self.Qsa[(state, action)] + v) / (
+                    self.Nsa[(state, action)] + 1)
+            self.Nsa[(state, action)] += 1
 
         else:
-            self.Qsa[(s, a)] = v
-            self.Nsa[(s, a)] = 1
+            self.Qsa[(state, action)] = v
+            self.Nsa[(state, action)] = 1
 
-        # self.branch_mem[s] += 1  # TODO decide
-        self.Ns[s] += 1
+        self.Ns[state] += 1
         return -v

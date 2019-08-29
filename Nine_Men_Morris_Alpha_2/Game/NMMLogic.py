@@ -89,7 +89,7 @@ class Board(Base_mill):
         return action_mask
 
     def decode_action(self, player: int, action_code: int):
-        piece, action, remove = np.unravel_index(action_code, (24, 5, 25))  # there is additional code for end of game
+        piece, action, remove = np.unravel_index(action_code, (24, 5, 25), 'C')
         if action == 4:  #
             self.execute_move(player, remove=24, set_place=piece, remove_opponent=remove)
         else:
@@ -109,7 +109,7 @@ class Board(Base_mill):
         unique, counts = np.unique(board, return_counts=True)
         opp_count = dict(zip(unique, counts))[-player]
         if opp_count <= 2 or not np.sum(self.get_legal_moves(-player)):
-            print(f"player {player} wins")
+            # print(f"player {player} wins")
             return True
 
         return False
@@ -162,7 +162,7 @@ class Board(Base_mill):
 
     def canonical_board(self, player):
         step = self.decode_step_count()
-        self.matrix_board *= -1  # TODO: originaly it was *= player, validate
+        self.matrix_board *= player  # TODO: originaly it was *= player, validate
         self.encode_step_count(step)
         return self.matrix_board
 
@@ -246,8 +246,6 @@ class Board(Base_mill):
                 s = '-'
                 color = 'red'
             return color, s
-
-
 
         next_board = self.get_clean_board(next_board)
         n = next_board.shape[0]
