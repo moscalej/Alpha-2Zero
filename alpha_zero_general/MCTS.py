@@ -57,6 +57,7 @@ class MCTS():
         # probs = softmax(counts) * np.array(counts) != 0
         counts = np.array(counts)
         probs = counts / sum(counts)
+        # print(np.std(counts))
         return probs
 
     def search(self, canonical_board, verbose=False):
@@ -85,10 +86,10 @@ class MCTS():
             self.branch_mem[state] = 1
         elif self.branch_mem['deep'] > 100:
             return - 1e-4
-
         else:
             self.branch_mem[state] += 1
             # return - 1
+
         if state not in self.Es:
             # checks if the game has ended
             # 0  Means the game still continues
@@ -99,36 +100,29 @@ class MCTS():
         if self.Es[state] != 0:
             # This is a End game node the value for the upper
 
-            # scope will be the negative of this one
-            # print(f'Monte Carlo find a winner and is :{self.Es[state]}')
-            return -self.Es[state]
-
+            return -1 * self.Es[state]
 
         if state not in self.Ps:  # policy state meaning we did not evaluate this before
 
             # leaf node
-            self.Ps[state], v_network = self.nnet.predict(canonical_board)
-            t = max(self.Ps[state])
+            polici_network, v_network = self.nnet.predict(canonical_board)
             valids = self.game.get_valid_moves(canonical_board, 1)
-            self.Ps[state] = self.Ps[state] * valids  # masking invalid moves
-            sum_Ps_s = np.sum(self.Ps[state])
+            polici_network_mask = polici_network * valids  # masking invalid moves
+            sum_Ps_s = np.sum(polici_network_mask)
 
             if sum_Ps_s > 0:
-                self.Ps[state] /= sum_Ps_s  # renormalize
+                self.Ps[state] = polici_network_mask / sum_Ps_s
             else:
                 # if all valid moves were masked make all valid moves equally probable
                 # NB! All valid moves may be masked if either your NNet architecture is
-                # insufficient or you've get overfitting or something else.
-                # If you have got dozens or hundreds of these messages you should pay
-                # attention to your NNet and/or training process.
+
                 print("All valid moves were masked, do workaround.")
-                self.Ps[state] = self.Ps[state] + valids
-                self.Ps[state] /= np.sum(self.Ps[state])
+                self.Ps[state] = valids / sum(valids)
 
             self.Vs[state] = valids
             self.Ns[state] = 0
             self.branch_mem["end"] = 1
-            return -v_network[0]
+            return -1 * v_network[0]
 
         valids = self.Vs[state]
         cur_best = -float('inf')
@@ -140,20 +134,27 @@ class MCTS():
                 if (state, action) in self.Qsa:
                     # This provides some exploration if Nsa is small then u will be bigger --> explore less
                     Qsa = self.Qsa[(state, action)]
-                    Ps = self.Ps[state][action]
+                    Ps_a = self.Ps[state][action]
                     Ns = self.Ns[state]
                     Nsa = self.Nsa[(state, action)]
                     next_s, next_player = self.game.get_next_state(canonical_board, 1, action)
                     next_s = self.game.get_canonical_form(next_s, next_player)
                     next_string = self.game.string_representation(next_s)
+                    cpuct = self.args.cpuct
                     if next_string in self.branch_mem:
-                        u = Qsa + self.args.cpuct * Ps * math.sqrt(Ns) / (1 + Nsa + self.branch_mem[next_string]**2)
+                        b = cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa + self.branch_mem[next_string])
+                        u = Qsa + b
                     else:
-                        u = Qsa + self.args.cpuct * Ps * math.sqrt(Ns) / (1 + Nsa )
+                        b = cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
+                        u = Qsa + cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
+
                 else:
-                    Ps = self.Ps[state][action]
+
+                    Ps_a = self.Ps[state][action]
                     Ns = self.Ns[state]
-                    u = self.args.cpuct * Ps * math.sqrt(Ns + EPS)  # Q = 0 ?
+                    cpuct = self.args.cpuct
+
+                    u = cpuct * Ps_a * math.sqrt(Ns + EPS)  # Q = 0 ?
 
                 if u > cur_best:
                     cur_best = u
@@ -170,17 +171,9 @@ class MCTS():
 
         next_s, next_player = self.game.get_next_state(canonical_board, 1, action)
         next_s = self.game.get_canonical_form(next_s, next_player)
-        try:
-            next_s_string = self.game.string_representation(next_s)
-            v = self.search(next_s)  # a
 
-        except RecursionError:
-            print("recursion")
-            t = np.array(self.Ps[state])
-            print(f"np.sum(self.Ps[s]){np.sum(t != 0)}")
-            print(f'Values are : {t[t != 0]}')
-            self.Es[state] != 1e-4
-            return 0
+        next_s_string = self.game.string_representation(next_s)
+        v = self.search(next_s)
 
         if (state, action) in self.Qsa:  # if (s,a) exists, update, otherwise, set
             self.Qsa[(state, action)] = (self.Nsa[(state, action)] * self.Qsa[(state, action)] + v) / (
@@ -192,4 +185,4 @@ class MCTS():
             self.Nsa[(state, action)] = 1
 
         self.Ns[state] += 1
-        return -v
+        return - v

@@ -6,7 +6,7 @@ from Nine_Men_Morris_Alpha_2.keras.NNet import NNetWrapper as NeuralNetwork
 from utils import *
 
 args = dotdict({
-    'numIters': 1000,
+    'numIters': 100,
     'numEps': 100,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
@@ -16,7 +16,7 @@ args = dotdict({
     'cpuct': 0.07,
     'epochs': 40,
     'checkpoint': './temp/',
-    'load_model': True,
+    'load_model': False,
     'load_folder_file': ('.\\temp', 'checkpoint_1.pth.tar'),
     'load_folder_Sample': ('.\\temp', 'checkpoint_1.pth.tar'),
     'numItersForTrainExamplesHistory': 20,

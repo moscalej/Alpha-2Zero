@@ -11,7 +11,18 @@ import sys
 import datetime
 
 PATH = r'C:\Users\amoscoso\Documents\Technion\deeplearning\Alpha-2Zero\alpha_zero_general\data'
-
+def winner(outcome: int, player: int, current: int) -> int:
+    """
+    Returns the winner
+    :param outcome: outcome = 1 player == current --> -1
+    :param player:
+    :param current:
+    :type current:
+    :return:
+    :rtype:
+    """
+    val = outcome * ((-1) ** (player != current))
+    return val
 from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board
 
 
@@ -56,30 +67,14 @@ class Coach:
         moves_verbose = []  # REMOVE
         b_obj = Board()  # REMOVE
 
-        def winner(outcome: int, player: int, current: int) -> int:
-            """
-            Returns the winner
-            :param outcome: outcome = 1 player == current --> -1
-            :param player:
-            :param current:
-            :type current:
-            :return:
-            :rtype:
-            """
-            val=  outcome * ((-1) ** (player != current))
-            return val
+        self.mcts = MCTS(self.game, self.nnet, self.args)
 
         while True:
             episode_step += 1
             canonical_board = self.game.get_canonical_form(board, self.curPlayer)
-
             temp = int(episode_step < self.args.tempThreshold)
-
             pi = self.mcts.get_action_prob(canonical_board, temp=temp)
-            sym = self.game.get_symmetries(canonical_board, pi)
-            for board_, pi_ in sym:
-                train_examples.append([board_, self.curPlayer, pi_, None])
-
+            train_examples.append([canonical_board, self.curPlayer, pi, None])
             action = np.random.choice(len(pi), p=pi)
 
             #########################  TODO: remove after testing
@@ -220,3 +215,5 @@ class Coach:
             f.closed
             # examples based on the model were already collected (loaded)
             self.skipFirstSelfPlay = True
+
+
