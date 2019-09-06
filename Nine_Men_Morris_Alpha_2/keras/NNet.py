@@ -19,9 +19,9 @@ from .NMM_NNet import NMM_NNet as onnet
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
-    'epochs': 20,
-    'batch_size': 64,
-    'cuda': False,
+    'epochs': 50,
+    'batch_size': 1024,
+    'cuda': True,
     'num_channels': 512,
     'verbose': 2
 })

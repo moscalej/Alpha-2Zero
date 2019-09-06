@@ -84,8 +84,7 @@ class MenMorris(Game):
 
     def string_representation(self, board:np.ndarray):
         # 8x8 numpy array (canonical board)
-        t = np.array2string(board)
-        return t
+        return board.tostring()
 
     def get_board_obj(self, board):
         return Board(board)

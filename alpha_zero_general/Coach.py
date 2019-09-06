@@ -21,8 +21,17 @@ def winner(outcome: int, player: int, current: int) -> int:
     :return:
     :rtype:
     """
-    val = outcome * ((-1) ** (player != current))
-    return val
+    if outcome == 1:
+        if player == 1:
+            return 1
+        else:
+            return -1
+    else:
+        if player == -1 :
+            return 1
+        else:
+            return -1
+
 from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board
 
 
@@ -42,7 +51,7 @@ class Coach:
         self.skipFirstSelfPlay = False  # can be overriden in loadTrainExamples()
         self.curPlayer = None
 
-    def execute_episode(self) -> list:
+    def execute_episode(self, verbose) -> list:
         """
         This function executes one episode of self-play, starting with player 1.
         As the game is played, each turn is added as a training example to
@@ -67,14 +76,14 @@ class Coach:
         moves_verbose = []  # REMOVE
         b_obj = Board()  # REMOVE
 
-        self.mcts = MCTS(self.game, self.nnet, self.args)
+        # self.mcts = MCTS(self.game, self.nnet, self.args)
 
         while True:
             episode_step += 1
             canonical_board = self.game.get_canonical_form(board, self.curPlayer)
             temp = int(episode_step < self.args.tempThreshold)
-            pi = self.mcts.get_action_prob(canonical_board, temp=temp)
-            train_examples.append([canonical_board, self.curPlayer, pi, None])
+            pi = self.mcts.get_action_prob(canonical_board.copy(), temp=temp)
+            train_examples.append((canonical_board.copy(), self.curPlayer, pi.copy(), None))
             action = np.random.choice(len(pi), p=pi)
 
             #########################  TODO: remove after testing
@@ -91,19 +100,24 @@ class Coach:
             #     sys.stdout.close()
             #     sys.stdout = original
             # ########################
-            # b_1 = Board(canonical_board)
-            # b_1.verbose_game(canonical_board,action)
-            new_board, new_player = self.game.get_next_state(board, self.curPlayer, action)
-            # b_2= Board(new_board)
-            # b_2.verbose_game(new_board)
 
-            response = self.game.get_game_ended(new_board, new_player)
+            if verbose:
+                b_1 = Board(canonical_board)
+                b_1.verbose_game(canonical_board,action)
+            new_board, new_player = self.game.get_next_state(board, self.curPlayer, action)
+            if verbose:
+                b_2= Board(new_board)
+                b_2.verbose_game(new_board)
+
+            response = self.game.get_game_ended(new_board, 1)
 
             if response != 0:
                 last_player = new_player
                 print("Simulated game end")
                 print(f"Number of iterations was {episode_step}")
                 print(f"Last move was done by {self.curPlayer}")
+                b_2 = Board(new_board)
+                b_2.verbose_game(new_board)
                 winer = {
                     (1, 1) : 'player 1',
                     (1,-1) : 'player -1',
@@ -111,11 +125,18 @@ class Coach:
                     (-1,-1) : 'player -1',
                 }[last_player,response]
                 print(f"This move make the winner to be{winer}")
-                return [(board_m, pi_, winner(response, player_, new_player))
-                        for board_m, player_, pi_, _ in train_examples]
+                vals = []
+                for board_m, player_, pi_, _ in train_examples:
+                    val = (board_m, pi_, winner(response, player_, new_player))
+                    vals.append(val)
+                print(vals[-1][2])
+
+                return vals
+            if episode_step > 80:
+                return
             self.curPlayer = new_player
             board = new_board
-    def learn(self):
+    def learn(self, verbose):
         """
         Performs numIters iterations with numEps episodes of self-play in each
         iteration. After every iteration, it retrains neural network with
@@ -137,7 +158,9 @@ class Coach:
 
                 for eps in range(self.args.numEps):
                     self.mcts = MCTS(self.game, self.nnet, self.args)
-                    iteration_train_examples += self.execute_episode()
+                    results = self.execute_episode(verbose)
+                    if results is not None:
+                        iteration_train_examples += results
 
                     # bookkeeping + plot progress
                     eps_time.update(time.time() - end)
@@ -164,21 +187,21 @@ class Coach:
                 train_examples.extend(e)
             shuffle(train_examples)
 
-            # training new network, keeping a copy of the old one
-            self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
-            self.pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
-            pmcts = MCTS(self.game, self.pnet, self.args)
+            # # training new network, keeping a copy of the old one
+            # self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp1.pth.tar')
+            # self.pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp1.pth.tar')
+            # pmcts = MCTS(self.game, self.pnet, self.args)
 
             self.nnet.train(train_examples)
-            nmcts = MCTS(self.game, self.nnet, self.args)
+            # nmcts = MCTS(self.game, self.nnet, self.args)
 
-            print('PITTING AGAINST PREVIOUS VERSION')
-            arena = Arena(lambda x: np.argmax(pmcts.get_action_prob(x, temp=0, )),
-                          lambda x: np.argmax(nmcts.get_action_prob(x, temp=0, )), self.game)
-            pwins, nwins, draws = arena.playGames(self.args.arenaCompare)
-
-            print('NEW/PREV WINS : %d / %d ; DRAWS : %d' % (nwins, pwins, draws))
-            # if pwins + nwins == 0 or float(nwins) / (pwins + nwins) < self.args.updateThreshold:
+            # print('PITTING AGAINST PREVIOUS VERSION')
+            # arena = Arena(lambda x: np.argmax(pmcts.get_action_prob(x, temp=0, )),
+            #               lambda x: np.argmax(nmcts.get_action_prob(x, temp=0, )), self.game)
+            # pwins, nwins, draws = arena.playGames(self.args.arenaCompare)
+            #
+            # print('NEW/PREV WINS : %d / %d ; DRAWS : %d' % (nwins, pwins, draws))
+            # # if pwins + nwins == 0 or float(nwins) / (pwins + nwins) < self.args.updateThreshold:
 
             if False:
                 print('REJECTING NEW MODEL')
@@ -189,20 +212,20 @@ class Coach:
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
 
     def getCheckpointFile(self, iteration):
-        return f'checkpoint_{iteration}.pth.tar'
+        return f'checkpoint_{iteration+1}.pth.tar'
 
     def saveTrainExamples(self, iteration):
         folder = self.args.checkpoint
         if not os.path.exists(folder):
             os.makedirs(folder)
-        filename = os.path.join(folder, self.getCheckpointFile(iteration) + ".examples")
+        filename = os.path.join(folder, self.getCheckpointFile(iteration) + ".examples1")
         with open(filename, "wb+") as f:
             Pickler(f).dump(self.trainExamplesHistory)
         f.closed
 
     def loadTrainExamples(self):
         modelFile = os.path.join(self.args.load_folder_file[0], self.args.load_folder_file[1])
-        examplesFile = modelFile + ".examples"
+        examplesFile = modelFile + ".examples1"
         if not os.path.isfile(examplesFile):
             print(examplesFile)
             r = input("File with trainExamples not found. Continue? [y|n]")

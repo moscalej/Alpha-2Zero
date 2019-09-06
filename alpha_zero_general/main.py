@@ -7,18 +7,19 @@ from utils import *
 
 args = dotdict({
     'numIters': 100,
-    'numEps': 100,
+    'numEps': 80,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
-    'maxlenOfQueue': 200000,
-    'numMCTSSims': 20,
-    'arenaCompare': 40,
-    'cpuct': 0.07,
-    'epochs': 40,
+    'maxlenOfQueue': 300000,
+    'numMCTSSims': 25,
+    'arenaCompare': 10,
+    'cpuct': 0.01,
+    'n_importance' : 0.1,
+    'epochs': 60,
     'checkpoint': './temp/',
-    'load_model': False,
+    'load_model': True,
     'load_folder_file': ('.\\temp', 'checkpoint_1.pth.tar'),
-    'load_folder_Sample': ('.\\temp', 'checkpoint_1.pth.tar'),
+    'load_folder_Sample': ('.\\temp1', 'checkpoint_5.pth.tar.examples'),
     'numItersForTrainExamplesHistory': 20,
 
 })
@@ -33,10 +34,12 @@ if __name__=="__main__":
     neural_network = NeuralNetwork(game)
 
     if args.load_model:
-        neural_network.load_checkpoint(args.load_folder_file[0], args.load_folder_file[1])
+        neural_network.load_checkpoint(args.load_folder_file[0], 'best.pth.tar')
 
     coach = Coach(game, neural_network, args)
     if args.load_model:
+        # coach.loadTrainExamples()
+
         print("Load trainExamples from file")
         # coach.loadTrainExamples()
-    coach.learn()
+    coach.learn(verbose = False)

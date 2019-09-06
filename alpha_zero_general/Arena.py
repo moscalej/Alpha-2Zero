@@ -48,26 +48,28 @@ class Arena():
         continue_game = True
         while continue_game:
             it += 1
-            # if verbose:
-            #     assert self.display
-            #     print(f"Turn {it}, Player  {curPlayer}")
-            #     self.display(board)
+            if False:
+                assert self.display
+                print(f"Turn {it}, Player  {curPlayer}")
+                self.display(board)
             canonical_board = self.game.get_canonical_form(board, curPlayer)
             action = players[curPlayer + 1](canonical_board)
 
             valids = self.game.get_valid_moves(self.game.get_canonical_form(board, curPlayer), 1)
-
+            # self.display(board)
             if valids[action] == 0:
                 print(action)
                 assert valids[action] > 0
-            board, curPlayer = self.game.get_next_state(board, curPlayer, action)
-            if( self.game.get_game_ended(board, curPlayer) != 0):
+            board, next_player = self.game.get_next_state(board, curPlayer, action)
+            # self.display(board)
+            if( self.game.get_game_ended(board, 1) != 0):
                 continue_game = False
                 if verbose:
                     assert (self.display)
                     print("Game over: Turn ", str(it), "Result ", str(self.game.get_game_ended(board, 1)))
                     print(f'The Looser of the game is{players_names[curPlayer + 1]}')
                     self.display(board)
+            curPlayer = next_player
         return self.game.get_game_ended(board, 1)
 
     def playGames(self, num, verbose=False):

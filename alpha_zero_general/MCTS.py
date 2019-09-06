@@ -39,7 +39,7 @@ class MCTS():
         b = Board(canonical_board)
         debug = b.decode_step_count()
         for i in range(self.args.numMCTSSims):
-            self.branch_mem = {'deep': 0}  # TODO
+            self.branch_mem = {'deep': 0, 'b_s': 'ba', "ba": {}, "bb": {}}  # TODO
             self.search(canonical_board.copy())
 
         s = self.game.string_representation(canonical_board)
@@ -51,10 +51,6 @@ class MCTS():
             probs[bestA] = 1
             return probs
 
-        # counts = [x ** (1. / temp) for x in counts]
-        # counts = [x ** (1. / temp) for x in counts]
-        # probs = [x / float(sum(counts)) for x in counts]
-        # probs = softmax(counts) * np.array(counts) != 0
         counts = np.array(counts)
         probs = counts / sum(counts)
         # print(np.std(counts))
@@ -82,13 +78,11 @@ class MCTS():
 
         state = self.game.string_representation(canonical_board)
         self.branch_mem['deep'] += 1
-        if state not in self.branch_mem:
-            self.branch_mem[state] = 1
-        elif self.branch_mem['deep'] > 100:
+        branch_mem = self.branch_mem[self.branch_mem['b_s']]
+        if state not in branch_mem:
+            self.branch_mem[self.branch_mem['b_s']][state] = self.branch_mem['b_s']
+        if self.branch_mem['deep'] > 80:
             return - 1e-4
-        else:
-            self.branch_mem[state] += 1
-            # return - 1
 
         if state not in self.Es:
             # checks if the game has ended
@@ -122,11 +116,13 @@ class MCTS():
             self.Vs[state] = valids
             self.Ns[state] = 0
             self.branch_mem["end"] = 1
-            return -1 * v_network[0]
+            return - self.args.n_importance * v_network[0]
 
         valids = self.Vs[state]
         cur_best = -float('inf')
         best_act = -1
+
+        next_branch = 'bb' if self.branch_mem['b_s'] == 'ba' else 'ba'
 
         # pick the action with the highest upper confidence bound
         for action in range(self.game.get_action_size()):
@@ -141,12 +137,11 @@ class MCTS():
                     next_s = self.game.get_canonical_form(next_s, next_player)
                     next_string = self.game.string_representation(next_s)
                     cpuct = self.args.cpuct
-                    if next_string in self.branch_mem:
-                        b = cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa + self.branch_mem[next_string])
-                        u = Qsa + b
-                    else:
-                        b = cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
-                        u = Qsa + cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
+                    if next_string in self.branch_mem[next_branch]:
+                        continue
+                    b = cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
+                    u = Qsa + cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
+
 
                 else:
 
@@ -159,7 +154,10 @@ class MCTS():
                 if u > cur_best:
                     cur_best = u
                     best_act = action
-
+                    second_best = best_act
+                    fird_best = second_best
+        if best_act == -1:
+            return 1e-4
         action = best_act
 
         # <debug>
@@ -171,13 +169,24 @@ class MCTS():
 
         next_s, next_player = self.game.get_next_state(canonical_board, 1, action)
         next_s = self.game.get_canonical_form(next_s, next_player)
+        try:
+            next_s_string = self.game.string_representation(next_s)
+            self.branch_mem['b_s'] = next_branch
+            v = self.search(next_s)  # a
 
-        next_s_string = self.game.string_representation(next_s)
-        v = self.search(next_s)
+        except RecursionError:
+            print("recursion")
+            t = np.array(self.Ps[state])
+            print(f"np.sum(self.Ps[s]){np.sum(t != 0)}")
+            print(f'Values are : {t[t != 0]}')
+            self.Es[state] != 1e-4
+            return 0
 
         if (state, action) in self.Qsa:  # if (s,a) exists, update, otherwise, set
-            self.Qsa[(state, action)] = (self.Nsa[(state, action)] * self.Qsa[(state, action)] + v) / (
+            a = (self.Nsa[(state, action)] * self.Qsa[(state, action)] + v) / (
                     self.Nsa[(state, action)] + 1)
+            b = self.Qsa[(state, action)]
+            self.Qsa[(state, action)] = a
             self.Nsa[(state, action)] += 1
 
         else:
@@ -185,4 +194,4 @@ class MCTS():
             self.Nsa[(state, action)] = 1
 
         self.Ns[state] += 1
-        return - v
+        return - v * 0.85

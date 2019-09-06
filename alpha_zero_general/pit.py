@@ -21,21 +21,26 @@ args = dotdict({
     'maxlenOfQueue': 200000,
     'numMCTSSims': 25,
     'arenaCompare': 40,
-    'cpuct': 0.4,
+    'n_importance' : 0.04,
+    'cpuct': 0.04,
     'epochs': 40,
     'checkpoint': r'C:\Users\amoscoso\Documents\Technion\deeplearning\Alpha-2Zero\alpha_zero_general\temp',
-    'load_model': False,
-    'load_folder_file': ('.\\temp', 'temp.pth.tar'),
-    'load_folder_Sample': ('.\\temp', 'checkpoint_64.pth.tar.tar'),
+    'load_model': True,
+    'load_folder_file': ('.\\temp', 'best.pth.tar'),
+    'load_folder_Sample': ('.\\temp', 'best.pth.tar.tar'),
     'numItersForTrainExamplesHistory': 20,
 })
 
 game = Game(men_count=9)
 
 neural_network = NeuralNetwork(game)
-neural_network.load_checkpoint(folder=args.checkpoint, filename='temp.pth.tar')
+neural_network.load_checkpoint(folder=args.checkpoint, filename='best.pth.tar')
+
+# old_nn = NeuralNetwork(game)
+# old_nn.load_checkpoint(folder=args.checkpoint, filename='checkpoint_2.pth.tar')
 
 our_player = MCTS(game, neural_network, args)
+# old_nn_player = MCTS(game, old_nn, args)
 other_player = NN_player_wrapper()
 
 
@@ -46,15 +51,23 @@ def player_ramdon(board):
     choise = np.random.choice(valids_ind[0])
     return  choise
 
-
+#
 print('Let the fight Begin')
 arena = Arena(lambda x: np.argmax(our_player.get_action_prob(x)),
-              player_ramdon, game, lambda x: Board(x).verbose_game(x),"Alpha_Zero", "Ramdom")
+              player_ramdon,
+              game, lambda x: Board(x).verbose_game(x),"Alpha_Zero", "Random")
+print(arena.playGames(40, verbose=True))
+#
 
-print(arena.playGames(2, verbose=True))
+# print('Let the fight Begin')
+# arena = Arena(lambda x: np.argmax(our_player.get_action_prob(x)),
+#               other_player,
+#               game, lambda x: Board(x).verbose_game(x),"Alpha_Zero", "Other")
 
-print('Let the fight Begin')
-arena = Arena(other_player,
-              player_ramdon, game, lambda x: Board(x).verbose_game(x),"Other Network", "Ramdom")
+# print(arena.playGames(20, verbose=True))
 
-print(arena.playGames(2, verbose=True))
+# print('Let the fight Begin')
+# arena = Arena(lambda x: np.argmax(our_player.get_action_prob(x)),
+#               player_ramdon, game, lambda x: Board(x).verbose_game(x),"Alpha_Zero", "Ramdom")
+#
+# print(arena.playGames(30, verbose=False))
