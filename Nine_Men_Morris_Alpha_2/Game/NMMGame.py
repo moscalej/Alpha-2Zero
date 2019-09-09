@@ -1,5 +1,3 @@
-
-
 import numpy as np
 from alpha_zero_general.Game import Game
 from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board
@@ -35,7 +33,7 @@ class MenMorris(Game):
         # board = np.copy(b.matrix_board)
         return b.matrix_board, -player
 
-    def get_valid_moves(self, board: np.ndarray, player:int) -> list:
+    def get_valid_moves(self, board: np.ndarray, player: int) -> list:
         # return a fixed size binary vector
         b = Board(board.copy())
         b.board = [b.matrix_board[b.board_map[i]] for i in range(24)]
@@ -65,7 +63,7 @@ class MenMorris(Game):
         b = Board(board.copy())
         return b.canonical_board(player)
 
-    def get_symmetries(self, board: np.ndarray, pi:float)-> list:
+    def get_symmetries(self, board: np.ndarray, pi: float) -> list:
         # mirror, rotational
         # assert(len(pi) == self.n**2+1)  # 1 for pass
         # pi_board = np.reshape(pi[:-1], (24, 5, 25))
@@ -82,12 +80,9 @@ class MenMorris(Game):
         l = [(board, pi)]
         return l
 
-    def string_representation(self, board:np.ndarray):
+    def string_representation(self, board: np.ndarray):
         # 8x8 numpy array (canonical board)
         return board.tostring()
 
     def get_board_obj(self, board):
         return Board(board)
-
-
-

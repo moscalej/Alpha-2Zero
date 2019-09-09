@@ -1,5 +1,4 @@
 import numpy as np
-from pytorch_classification.utils import Bar, AverageMeter
 import time
 
 
@@ -82,8 +81,7 @@ class Arena():
             twoWon: games won by player2
             draws:  games won by nobody
         """
-        eps_time = AverageMeter()
-        bar = Bar('Arena.playGames', max=num)
+
         end = time.time()
         eps = 0
         maxeps = int(num)
@@ -102,14 +100,7 @@ class Arena():
                 draws += 1
             # bookkeeping + plot progress
             eps += 1
-            eps_time.update(time.time() - end)
-            end = time.time()
-            bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps + 1,
-                                                                                                       maxeps=maxeps,
-                                                                                                       et=eps_time.avg,
-                                                                                                       total=bar.elapsed_td,
-                                                                                                       eta=bar.eta_td)
-            bar.next()
+
 
         print(f'player {1} state--> won: {oneWon} loss: {twoWon}')
         self.player1, self.player2 = self.player2, self.player1
@@ -125,15 +116,6 @@ class Arena():
                 draws += 1
             # bookkeeping + plot progress
             eps += 1
-            eps_time.update(time.time() - end)
             end = time.time()
-            bar.suffix = '({eps}/{maxeps}) Eps Time: {et:.3f}s | Total: {total:} | ETA: {eta:}'.format(eps=eps + 1,
-                                                                                                       maxeps=num,
-                                                                                                       et=eps_time.avg,
-                                                                                                       total=bar.elapsed_td,
-                                                                                                       eta=bar.eta_td)
-            bar.next()
-
-        bar.finish()
 
         return oneWon, twoWon, draws

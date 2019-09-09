@@ -25,7 +25,7 @@ class MCTS():
         self.Ps = {}  # stores initial policy (returned by neural net)
 
         self.Es = {}  # stores game.get_game_ended ended for board s
-        self.Vs = {}  # stores game.get_valid_moves for board s
+        self.valid_actions = {}  # stores game.get_valid_moves for board s
 
     def get_action_prob(self, canonical_board: np.ndarray, temp=1) -> np.ndarray:
         """
@@ -39,7 +39,7 @@ class MCTS():
         b = Board(canonical_board)
         debug = b.decode_step_count()
         for i in range(self.args.numMCTSSims):
-            self.branch_mem = {'deep': 0, 'b_s': 'ba', "ba": {}, "bb": {}}  # TODO
+            self.branch_mem = {'deep': 0, 'b_s': 'ba', "ba": {}, "bb": {}}
             self.search(canonical_board.copy())
 
         s = self.game.string_representation(canonical_board)
@@ -51,9 +51,8 @@ class MCTS():
             probs[bestA] = 1
             return probs
 
-        counts = np.array(counts)
+        counts = np.array(counts).copy()
         probs = counts / sum(counts)
-        # print(np.std(counts))
         return probs
 
     def search(self, canonical_board, verbose=False):
@@ -93,7 +92,7 @@ class MCTS():
 
         if self.Es[state] != 0:
             # This is a End game node the value for the upper
-
+            assert self.Es[state] == -1, f"Impossible to wim, the value was:{self.Es[state]}"
             return -1 * self.Es[state]
 
         if state not in self.Ps:  # policy state meaning we did not evaluate this before
@@ -113,12 +112,12 @@ class MCTS():
                 print("All valid moves were masked, do workaround.")
                 self.Ps[state] = valids / sum(valids)
 
-            self.Vs[state] = valids
+            self.valid_actions[state] = valids
             self.Ns[state] = 0
             self.branch_mem["end"] = 1
             return - self.args.n_importance * v_network[0]
 
-        valids = self.Vs[state]
+        valids = self.valid_actions[state]
         cur_best = -float('inf')
         best_act = -1
 
@@ -142,9 +141,7 @@ class MCTS():
                     b = cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
                     u = Qsa + cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
 
-
                 else:
-
                     Ps_a = self.Ps[state][action]
                     Ns = self.Ns[state]
                     cpuct = self.args.cpuct
@@ -154,8 +151,8 @@ class MCTS():
                 if u > cur_best:
                     cur_best = u
                     best_act = action
-                    second_best = best_act
-                    fird_best = second_best
+                    # second_best = best_act
+                    # fird_best = second_best
         if best_act == -1:
             return 1e-4
         action = best_act
@@ -183,10 +180,11 @@ class MCTS():
             return 0
 
         if (state, action) in self.Qsa:  # if (s,a) exists, update, otherwise, set
-            a = (self.Nsa[(state, action)] * self.Qsa[(state, action)] + v) / (
-                    self.Nsa[(state, action)] + 1)
-            b = self.Qsa[(state, action)]
-            self.Qsa[(state, action)] = a
+
+            Nsa = self.Nsa[(state,action)]
+            Qsa = self.Qsa[(state,action)]
+            quality = (Nsa * Qsa + v) / (Nsa + 1)
+            self.Qsa[(state, action)] = quality
             self.Nsa[(state, action)] += 1
 
         else:
@@ -194,4 +192,4 @@ class MCTS():
             self.Nsa[(state, action)] = 1
 
         self.Ns[state] += 1
-        return - v * 0.85
+        return - v * 0.95

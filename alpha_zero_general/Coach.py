@@ -1,16 +1,16 @@
 from collections import deque
 from Arena import Arena
 from MCTS import MCTS
-
 import numpy as np
-from pytorch_classification.utils import Bar, AverageMeter
 import time, os, sys
 from pickle import Pickler, Unpickler
 from random import shuffle
 import sys
-import datetime
+from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board
 
 PATH = r'C:\Users\amoscoso\Documents\Technion\deeplearning\Alpha-2Zero\alpha_zero_general\data'
+
+
 def winner(outcome: int, player: int, current: int) -> int:
     """
     Returns the winner
@@ -27,12 +27,10 @@ def winner(outcome: int, player: int, current: int) -> int:
         else:
             return -1
     else:
-        if player == -1 :
+        if player == -1:
             return 1
         else:
             return -1
-
-from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board
 
 
 class Coach:
@@ -50,6 +48,7 @@ class Coach:
         self.trainExamplesHistory = []  # history of examples from args.numItersForTrainExamplesHistory latest iterations
         self.skipFirstSelfPlay = False  # can be overriden in loadTrainExamples()
         self.curPlayer = None
+        self.name ="Jorge"
 
     def execute_episode(self, verbose) -> list:
         """
@@ -71,12 +70,6 @@ class Coach:
         board = self.game.get_init_board()
         self.curPlayer = 1
         episode_step = 0
-
-        sample_collection = True  # REMOVE
-        moves_verbose = []  # REMOVE
-        b_obj = Board()  # REMOVE
-
-        # self.mcts = MCTS(self.game, self.nnet, self.args)
 
         while True:
             episode_step += 1
@@ -103,10 +96,10 @@ class Coach:
 
             if verbose:
                 b_1 = Board(canonical_board)
-                b_1.verbose_game(canonical_board,action)
+                b_1.verbose_game(canonical_board, action)
             new_board, new_player = self.game.get_next_state(board, self.curPlayer, action)
             if verbose:
-                b_2= Board(new_board)
+                b_2 = Board(new_board)
                 b_2.verbose_game(new_board)
 
             response = self.game.get_game_ended(new_board, 1)
@@ -119,11 +112,11 @@ class Coach:
                 b_2 = Board(new_board)
                 b_2.verbose_game(new_board)
                 winer = {
-                    (1, 1) : 'player 1',
-                    (1,-1) : 'player -1',
-                    (-1,1) : 'player 1',
-                    (-1,-1) : 'player -1',
-                }[last_player,response]
+                    (1, 1): 'player 1',
+                    (1, -1): 'player -1',
+                    (-1, 1): 'player 1',
+                    (-1, -1): 'player -1',
+                }[last_player, response]
                 print(f"This move make the winner to be{winer}")
                 vals = []
                 for board_m, player_, pi_, _ in train_examples:
@@ -132,10 +125,9 @@ class Coach:
                 print(vals[-1][2])
 
                 return vals
-            if episode_step > 80:
-                return
             self.curPlayer = new_player
             board = new_board
+
     def learn(self, verbose):
         """
         Performs numIters iterations with numEps episodes of self-play in each
@@ -152,25 +144,13 @@ class Coach:
             if not self.skipFirstSelfPlay or i > 1:
                 iteration_train_examples = deque([], maxlen=self.args.maxlenOfQueue)
 
-                eps_time = AverageMeter()
-                bar = Bar('Self Play', max=self.args.numEps)
-                end = time.time()
-
                 for eps in range(self.args.numEps):
                     self.mcts = MCTS(self.game, self.nnet, self.args)
                     results = self.execute_episode(verbose)
                     if results is not None:
                         iteration_train_examples += results
 
-                    # bookkeeping + plot progress
-                    eps_time.update(time.time() - end)
-                    end = time.time()
-                    bar.suffix = f'({eps + 1}/{self.args.numEps}) Eps Time: {eps_time.avg:.3f}s ' \
-                                 f'| Total: {bar.elapsed_td:} | ETA: {bar.eta_td:}'
-                    bar.next()
-                bar.finish()
-
-                # save the iteration examples to the history 
+                # save the iteration examples to the history
                 self.trainExamplesHistory.append(iteration_train_examples)
 
             if len(self.trainExamplesHistory) > self.args.numItersForTrainExamplesHistory:
@@ -212,7 +192,7 @@ class Coach:
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
 
     def getCheckpointFile(self, iteration):
-        return f'checkpoint_{iteration+1}.pth.tar'
+        return f'checkpoint_{iteration + 1}.pth.tar'
 
     def saveTrainExamples(self, iteration):
         folder = self.args.checkpoint
@@ -238,5 +218,3 @@ class Coach:
             f.closed
             # examples based on the model were already collected (loaded)
             self.skipFirstSelfPlay = True
-
-
