@@ -45,5 +45,5 @@ By doing this encoding we manage to express a greater amount of information on a
 - [x] Create an Interface to play against the opponent.
 - [x] Beat the Opponent
 # Authors 
-Alejandro Moscoso (moscalej@gmail.com)
+Alejandro Moscoso (moscalej@gmail.com)  
 Alex Finkelshtein ()
