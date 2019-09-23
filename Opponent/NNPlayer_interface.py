@@ -15,16 +15,6 @@ def piece_translator(c):
         print(f"illegal piece detected {c}")
 
 
-#
-# x = list('abcdefg')
-# y = list('7654321')
-#
-#
-# def translate_xy(s):
-#     our_x = x.index(s[0])
-#     our_y = y.index(s[1])
-#     return (our_x, our_y)
-
 def translate_(i):
     return i - 1
 
