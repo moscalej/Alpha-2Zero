@@ -46,4 +46,4 @@ By doing this encoding we manage to express a greater amount of information on a
 - [x] Beat the Opponent
 # Authors 
 Alejandro Moscoso (moscalej@gmail.com)  
-Alex Finkelshtein ()
+Alex Finkelshtein (ezsash@gmail.com)
