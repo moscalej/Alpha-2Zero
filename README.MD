@@ -40,10 +40,13 @@ By doing this encoding we manage to express a greater amount of information on a
 - [x] Implement the Alpha Zero Algorithm 
 - [x] Create a training flow with the game
 - [x] Improve the MCTS
-- [ ] Improve the DNN
 - [x] Find an opponent
 - [x] Create an Interface to play against the opponent.
 - [x] Beat the Opponent
+
+### Follow Up
+- [ ] Tensor State Encoding (with history)
+- [ ] Improve the DNN
 # Authors 
 Alejandro Moscoso (moscalej@gmail.com)  
 Alex Finkelshtein (ezsash@gmail.com)
