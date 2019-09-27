@@ -3,13 +3,14 @@ from alpha_zero_general.Game import Game
 from Nine_Men_Morris_Alpha_2.Game.NMMLogic import Board
 
 
-def compress_tensor(tensor_board: np.ndarray) -> np.ndarray:  # TODO Alejandro
+def compress_tensor(tensor_board: np.ndarray) -> np.ndarray:
     """
     Compress state representation to 7 by 7 board
-    :param tesor_board:
+    :param tensor_board:
     :return: 7 by 7 np.ndarray
     """
-    assert tensor_board.shape == (7, 7, 7), "Invalid Input Shape "
+    assert tensor_board.shape == (7, 7, 7),\
+        f"Invalid Input Shape: shape should be: (7,7,7) shape given was :{tensor_board.shape}"
     p1_layer = tensor_board[2, :, :]
     encoding_layer = tensor_board[3, :, :]
     p2_layer = tensor_board[4, :, :] * -1
@@ -50,8 +51,7 @@ def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> n
 def get_canonical_tensor(tensor_board: np.ndarray) -> np.ndarray:
     """
     switch between player 1 and player 2
-    :param prev_tensor_board:
-    :param new_board:
+    :param tensor_board:
     :return: 7 by 7 by 7 np.ndarray
     """
     assert tensor_board.shape == (7, 7, 7), "Invalid Input Shape "
