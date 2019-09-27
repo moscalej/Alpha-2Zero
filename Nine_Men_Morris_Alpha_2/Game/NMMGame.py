@@ -46,13 +46,12 @@ def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> n
     new_tensor_board[2, :, :] = p1_layer
     new_tensor_board[3, :, :] = encoding_layer
     new_tensor_board[4, :, :] = p2_layer
-
     return new_tensor_board
 
 
-def get_canonical_tensor(tensor_board: np.ndarray) -> np.ndarray:
+def flip_tensor(tensor_board: np.ndarray) -> np.ndarray:
     """
-    switch between player 1 and player 2
+    switch between player 1 and player -1
     :param tensor_board:
     :return: 7 by 7 by 7 np.ndarray
     """
@@ -68,43 +67,47 @@ class MenMorris(Game):
 
     def get_init_board(self):
         # return initial board (numpy board)
-        b = Board()
-        return b.matrix_board  # TODO: wrap with decompress
+        start_board = np.zeros((7, 7, 7), dtype=np.bool)
+        return start_board
 
     def get_board_size(self):
         # (a,b) tuple
-        return 7, 7  # TODO: consider changing
+        return 7, 7, 7
 
     def get_action_size(self):
         # return number of actions
         return self.actionSize
 
     def get_next_state(self, board: np.ndarray, player: int, action: int) -> (np.ndarray, int):
+        assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
         # if player takes action on board, return next (board,player)
         # action must be a valid move
         # TODO: wrap with compress
         if action == (self.actionSize - 1):
             return board, -player
-        b = Board(board.copy())
+        flat_board = compress_tensor(board)
+        b = Board(flat_board)
         b.decode_action(player, action)
-        # board = np.copy(b.matrix_board)
-        return b.matrix_board, -player  # TODO wrap with decompress
+        board = decompress_tensor(board, b.matrix_board)
+        return board, -player
 
     def get_valid_moves(self, board: np.ndarray, player: int) -> list:
         # return a fixed size binary vector
-        # TODO: wrap with compress
-        b = Board(board.copy())
+        assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
+        flat_board = compress_tensor(board)
+        b = Board(flat_board)
         b.board = [b.matrix_board[b.board_map[i]] for i in range(24)]
         legal_moves = b.get_legal_moves(player)
         legal_moves = list(legal_moves.reshape(-1))
         legal_moves.extend([0 if np.sum(legal_moves) > 0 else 1])
         return legal_moves
 
-    def get_game_ended(self, board: np.ndarray, player):
+    def get_game_ended(self, board: np.ndarray, player: int):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
         # player = 1
-        # TODO: wrap with compress
-        b = Board(board.copy())
+        assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
+        flat_board = compress_tensor(board)
+        b = Board(flat_board)
         b.board = [b.matrix_board[b.board_map[i]] for i in range(24)]
         if b.is_win(-player):
             return -player
@@ -117,10 +120,11 @@ class MenMorris(Game):
         return 1e-4 * player
 
     # TODO: wrap with get_canonical_tensor
-    def get_canonical_form(self, board: np.ndarray, player):
+    def get_canonical_form(self, board: np.ndarray, player: int) -> np.ndarray:
         # return state if player==1, else return -state if player==-1
-        b = Board(board.copy())
-        return b.canonical_board(player)
+        assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
+
+        return board if player is 1 else flip_tensor(board)
 
     def get_symmetries(self, board: np.ndarray, pi: float) -> list:
         # mirror, rotational
@@ -136,13 +140,14 @@ class MenMorris(Game):
         #             newB = np.fliplr(newB)
         #             newPi = np.fliplr(newPi)  # TODO check if this flip is correct
         #         l += [(newB, list(newPi.ravel()) + [pi[-1]])]
-        l = [(board, pi)]
-        return l
+        lala = [(board, pi)]
+        return lala
 
     def string_representation(self, board: np.ndarray):
         # 8x8 numpy array (canonical board)
         return board.tostring()
 
-    def get_board_obj(self, board):
-        # TODO: wrap with compress
-        return Board(board)
+    @staticmethod
+    def get_flat_board_obj(board: np.ndarray) -> Board:
+        assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
+        return Board(compress_tensor(board))

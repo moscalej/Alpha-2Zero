@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from Nine_Men_Morris_Alpha_2.Game.NMMGame import compress_tensor, decompress_tensor
+from Nine_Men_Morris_Alpha_2.Game.NMMGame import compress_tensor, decompress_tensor, flip_tensor
 
 EXAMPLE_TENSOR = np.array(
     [
@@ -166,14 +166,91 @@ RECONSTRUCTED = np.array(
 
 )
 
+FLIPED_TENSOR = np.array([
+    # Layer6 of the tensor
+    [
+        [0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+    ],
+    # Layer5 of the tensor
+    [
+        [0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0, 1, 0, 0, 0],
+    ],
+    # Layer4 of the tensor
+    [
+        [0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0, 0, 1, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0, 1, 0, 0, 0],
+    ],
+
+    # Layer3 of the tensor
+    [
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 1, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0],
+        [0, 0, 1, 0, 1, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+    ],
+    # Layer2 of the tensor
+    [
+        [1, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+    ],
+
+    # Layer1 of the tensor
+    [
+        [1, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+    ],
+
+    #  Layer0 of the tensor
+    [
+        [1, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+    ],
+
+])
+
 
 # %%
 
 class TestMMGame(unittest.TestCase):
 
     def test_compress_tensor(self):
-        self.assertEquals(np.sum(compress_tensor(EXAMPLE_TENSOR) == EXAMPLE_OUTPUT, axis=(0, 1)), 49,
-                          "Output is not as expected")
+        self.assertEqual(np.sum(compress_tensor(EXAMPLE_TENSOR) == EXAMPLE_OUTPUT, axis=(0, 1)), 49,
+                         "Output is not as expected")
 
     def test_decompress_tensor(self):
         out = decompress_tensor(EXAMPLE_TENSOR, EXAMPLE_OUTPUT)
@@ -181,5 +258,14 @@ class TestMMGame(unittest.TestCase):
         for layer in range(7):
             for row in range(7):
                 for column in range(7):
-                    self.assertEquals(out[layer, row, column], RECONSTRUCTED[layer, row, column],
-                                      f'Difference at layer: {layer}, row: {row}, column: {column}')
+                    self.assertEqual(out[layer, row, column], RECONSTRUCTED[layer, row, column],
+                                     f'Difference at layer: {layer}, row: {row}, column: {column}')
+
+    def test_get_canonical_tensor(self):
+        out = flip_tensor(EXAMPLE_TENSOR)
+
+        for layer in range(7):
+            for row in range(7):
+                for column in range(7):
+                    self.assertEqual(out[layer, row, column], FLIPED_TENSOR[layer, row, column],
+                                     f'Difference at layer: {layer}, row: {row}, column: {column}')

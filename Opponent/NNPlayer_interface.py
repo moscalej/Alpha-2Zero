@@ -101,22 +101,22 @@ def NN_player_wrapper(name='TEST-rawest-TFR'):
 
     def opp_player(our_state):
         game = NMMGame.MenMorris(9)
-        board = game.get_board_obj(our_state)
+        board = game.get_flat_board_obj(our_state)
         # the step count would be wrong for the initial 4 steps, but it doesn't effect the stage
         step_count = board.decode_step_count(our_state) + board.count_offset
-        isStage2 = step_count >= 18
+        is_stage2 = step_count >= 18
         pi_mask = np.array(game.get_valid_moves(our_state, 1))
         their_state_ = state_translator(our_state)
         their_state = process_game_line(their_state_)
         TO, FROM, REMOVE = their_player(their_state)
-        action_code = action_translator(isStage2, FROM, TO, REMOVE)
+        action_code = action_translator(is_stage2, FROM, TO, REMOVE)
 
         if pi_mask[action_code]:
             return action_code
         else:
             print("chose invalid action, taking random action")
             print("Original Action Details:")
-            print(f"action_code: {action_code} ; Stage: {2 if isStage2 else 1}")
+            print(f"action_code: {action_code} ; Stage: {2 if is_stage2 else 1}")
             print(board.verbose_game(our_state, action_code, no_board=True))
             print(f"their remaining: {their_state_[24:26]}")
             pi = (pi_mask * 1) / np.sum(pi_mask)  # uniform distribution of all valid moves
