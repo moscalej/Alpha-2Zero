@@ -98,7 +98,7 @@ RECONSTRUCTED = np.array(
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 1, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
         ],
@@ -147,7 +147,7 @@ RECONSTRUCTED = np.array(
             [0, 0, 0, 0, 0, 0, 1],
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 1],
+            [1, 0, 0, 0, 1, 0, 1],
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
             [1, 0, 0, 1, 0, 0, 0],
@@ -165,7 +165,9 @@ RECONSTRUCTED = np.array(
     ]
 
 )
-#%%
+
+
+# %%
 
 class TestMMGame(unittest.TestCase):
 
@@ -176,5 +178,8 @@ class TestMMGame(unittest.TestCase):
     def test_decompress_tensor(self):
         out = decompress_tensor(EXAMPLE_TENSOR, EXAMPLE_OUTPUT)
 
-        self.assertEquals(np.sum(out == EXAMPLE_OUTPUT, axis=(0, 1,2)), 49*7,
-                          "Output is not as expected")
+        for layer in range(7):
+            for row in range(7):
+                for column in range(7):
+                    self.assertEquals(out[layer,row,column], RECONSTRUCTED[layer,row,column],
+                                      f'Difference at layer: {layer}, row: {row}, column: {column}')
