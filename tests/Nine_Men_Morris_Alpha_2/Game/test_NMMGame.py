@@ -261,7 +261,7 @@ class TestMMGame(unittest.TestCase):
                     self.assertEqual(out[layer, row, column], RECONSTRUCTED[layer, row, column],
                                      f'Difference at layer: {layer}, row: {row}, column: {column}')
 
-    def test_get_canonical_tensor(self):
+    def test_flip_tensor(self):
         out = flip_tensor(EXAMPLE_TENSOR)
 
         for layer in range(7):

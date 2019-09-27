@@ -3,4 +3,5 @@ colored
 tensorflow
 keras
 termcolor
+numba
 
