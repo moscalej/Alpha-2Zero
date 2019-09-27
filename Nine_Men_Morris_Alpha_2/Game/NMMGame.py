@@ -90,16 +90,17 @@ class MenMorris(Game):
         board = decompress_tensor(board, b.matrix_board)
         return board, -player
 
-    def get_valid_moves(self, board: np.ndarray, player: int) -> list:
+    def get_valid_moves(self, board: np.ndarray, player: int) -> np.ndarray:
         # return a fixed size binary vector
         assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
         flat_board = compress_tensor(board)
+        legal_moves_flat = np.zeros(3001, int)
         b = Board(flat_board)
         b.board = [b.matrix_board[b.board_map[i]] for i in range(24)]
         legal_moves = b.get_legal_moves(player)
-        legal_moves = list(legal_moves.reshape(-1))
-        legal_moves.extend([0 if np.sum(legal_moves) > 0 else 1])
-        return legal_moves
+        legal_moves_flat[:-1] = legal_moves.reshape(-1)
+        legal_moves_flat[-1] = 0 if np.max(legal_moves) > 0 else 1
+        return legal_moves_flat
 
     def get_game_ended(self, board: np.ndarray, player: int):
         # return 0 if not ended, 1 if player 1 won, -1 if player 1 lost
@@ -113,7 +114,7 @@ class MenMorris(Game):
         if b.is_win(player):
             return player
         valid_moves = self.get_valid_moves(board, player)
-        if np.sum(valid_moves):  # game continues
+        if np.max(valid_moves):  # game continues
             return 0
         # draw has a very little value
         return 1e-4 * player
@@ -130,10 +131,16 @@ class MenMorris(Game):
         return lala
 
     def string_representation(self, board: np.ndarray):
-        assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
+        # assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
         return board.tobytes()
 
     @staticmethod
     def get_flat_board_obj(board: np.ndarray) -> Board:
         assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
         return Board(compress_tensor(board))
+
+
+@jit(nopython=True)
+def get_board(matrix_board):
+    for val in Board.board_map.values():
+        pass
