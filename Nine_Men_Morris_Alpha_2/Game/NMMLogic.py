@@ -1,7 +1,7 @@
 # from bkcharts.attributes import color
 import numpy as np
 
-from Nine_Men_Morris_Alpha_2.Game.base_board import Base_mill
+from Nine_Men_Morris_Alpha_2.Game.base_board import BaseMill
 from termcolor import colored
 
 
@@ -18,7 +18,7 @@ def int_to_bin_string(i):
     return s
 
 
-class Board(Base_mill):
+class Board(BaseMill):
 
     # list of all 8 directions on the board, as (x,y) offsets
     def __init__(self, matrix_b=None):

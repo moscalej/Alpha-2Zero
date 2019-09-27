@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-
 from Nine_Men_Morris_Alpha_2.Game.NMMGame import compress_tensor, decompress_tensor, flip_tensor
 
 EXAMPLE_TENSOR = np.array(
