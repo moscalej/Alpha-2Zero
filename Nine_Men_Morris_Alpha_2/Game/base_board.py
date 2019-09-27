@@ -137,8 +137,9 @@ class Base_mill:
         }
 
         self.count_offset = 4
+
         self.encoding_mask = np.zeros([7, 7], dtype=int)
+
         for coo in self.bits_map.values():
             self.encoding_mask[coo] = 1
-
 

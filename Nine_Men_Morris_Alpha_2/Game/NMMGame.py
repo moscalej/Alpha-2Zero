@@ -29,10 +29,12 @@ def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> n
     assert prev_tensor_board.shape == (7, 7, 7), "Invalid Input Shape "
     # decompress new board
     b = Board(new_board)
+
     encoding_layer = b.encoding_mask * new_board
     p1_mask = np.zeros([7, 7], dtype=int)
+
     p1_mask[np.where(new_board == 1)] = 1
-    p1_layer = new_board * p1_mask
+    p1_layer = new_board * p1_mask * (1 - b.encoding_mask)
     p2_mask = np.zeros([7, 7], dtype=int)
     p2_mask[np.where(new_board == -1)] = -1  # mask also negates values for player 2
     p2_layer = new_board * p2_mask

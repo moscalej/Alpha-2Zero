@@ -38,11 +38,11 @@ EXAMPLE_TENSOR = np.array(
         # Layer3 of the tensor
         [
             [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 1, 0, 1, 0, 0],
+            [0, 1, 0, 0, 0, 1, 0],
             [0, 0, 0, 1, 0, 0, 0],
+            [0, 1, 0, 0, 0, 1, 0],
             [0, 0, 1, 0, 1, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
         ],
         # Layer4 of the tensor
@@ -81,11 +81,11 @@ EXAMPLE_OUTPUT = np.array(
     # Out LaYER
     [
         [1, 0, 0, 1, 0, 0, -1],
-        [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 1, 0, 1, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0],
         [-1, 0, 0, 1, -1, 0, -1],
+        [0, 1, 0, 1, 0, 1, 0],
         [0, 0, 1, 1, 1, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0],
         [-1, 0, 0, -1, 0, 0, 0],
     ],
 )
@@ -125,11 +125,11 @@ RECONSTRUCTED = np.array(
         # Layer3 of the tensor
         [
             [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 1, 0, 1, 0, 0],
+            [0, 1, 0, 0, 0, 1, 0],
             [0, 0, 0, 1, 0, 0, 0],
+            [0, 1, 0, 0, 0, 1, 0],
             [0, 0, 1, 0, 1, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
         ],
         # Layer4 of the tensor
@@ -181,5 +181,5 @@ class TestMMGame(unittest.TestCase):
         for layer in range(7):
             for row in range(7):
                 for column in range(7):
-                    self.assertEquals(out[layer,row,column], RECONSTRUCTED[layer,row,column],
+                    self.assertEquals(out[layer, row, column], RECONSTRUCTED[layer, row, column],
                                       f'Difference at layer: {layer}, row: {row}, column: {column}')
