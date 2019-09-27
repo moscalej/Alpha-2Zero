@@ -9,7 +9,7 @@ def compress_tensor(tensor_board: np.ndarray) -> np.ndarray:
     :param tensor_board:
     :return: 7 by 7 np.ndarray
     """
-    assert tensor_board.shape == (7, 7, 7),\
+    assert tensor_board.shape == (7, 7, 7), \
         f"Invalid Input Shape: shape should be: (7,7,7) shape given was :{tensor_board.shape}"
     p1_layer = tensor_board[2, :, :]
     encoding_layer = tensor_board[3, :, :]
@@ -34,7 +34,7 @@ def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> n
     p1_mask = np.zeros([7, 7], dtype=int)
 
     p1_mask[np.where(new_board == 1)] = 1
-    p1_layer = new_board * p1_mask * (1 - b.encoding_mask)
+    p1_layer = new_board * p1_mask * (1 - b.encoding_mask)  # Todo Need to check if a float number will give a error
     p2_mask = np.zeros([7, 7], dtype=int)
     p2_mask[np.where(new_board == -1)] = -1  # mask also negates values for player 2
     p2_layer = new_board * p2_mask
