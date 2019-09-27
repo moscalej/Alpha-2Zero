@@ -18,7 +18,7 @@ def compress_tensor(tensor_board: np.ndarray) -> np.ndarray:
     return compressed_board
 
 
-def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> np.ndarray:  # TODO Alex
+def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> np.ndarray:
     """
     De-Compress state representation to 3 by 7 by 7 tensor board and push the older states out
     :param prev_tensor_board:
@@ -39,7 +39,8 @@ def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> n
     p2_mask[np.where(new_board == -1)] = -1  # mask also negates values for player 2
     p2_layer = new_board * p2_mask
     # push older layers mapping: new board goes to : [2,3,4] (p1,step,p2) ; t0: [2,4] -> t_1: [1,5], t1: [1,5] -> [0,6]
-    new_tensor_board = np.zeros([7, 7, 7], dtype=bool)
+    new_tensor_board = np.zeros([7, 7, 7], dtype=bool)  # TODO we sow that this is slow before maybe we should change
+    # TODO this
     layer_mappings = [(1, 0), (2, 1), (4, 5), (5, 6)]  # (from, to)
     for (from_, to_) in layer_mappings:
         new_tensor_board[to_, :, :] = prev_tensor_board[from_, :, :]
@@ -82,7 +83,6 @@ class MenMorris(Game):
         assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
         # if player takes action on board, return next (board,player)
         # action must be a valid move
-        # TODO: wrap with compress
         if action == (self.actionSize - 1):
             return board, -player
         flat_board = compress_tensor(board)
@@ -119,7 +119,6 @@ class MenMorris(Game):
         # draw has a very little value
         return 1e-4 * player
 
-    # TODO: wrap with get_canonical_tensor
     def get_canonical_form(self, board: np.ndarray, player: int) -> np.ndarray:
         # return state if player==1, else return -state if player==-1
         assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
@@ -127,24 +126,12 @@ class MenMorris(Game):
         return board if player is 1 else flip_tensor(board)
 
     def get_symmetries(self, board: np.ndarray, pi: float) -> list:
-        # mirror, rotational
-        # assert(len(pi) == self.n**2+1)  # 1 for pass
-        # pi_board = np.reshape(pi[:-1], (24, 5, 25))
-        # l = []
-        # board = board.copy()
-        # for i in range(1, 5):
-        #     for j in [True, False]:
-        #         newB = np.rot90(board, i)
-        #         newPi = np.rot90(pi_board, i)  # TODO check if this rotation is correct
-        #         if j:
-        #             newB = np.fliplr(newB)
-        #             newPi = np.fliplr(newPi)  # TODO check if this flip is correct
-        #         l += [(newB, list(newPi.ravel()) + [pi[-1]])]
+
         lala = [(board, pi)]
         return lala
 
     def string_representation(self, board: np.ndarray):
-        # 8x8 numpy array (canonical board)
+        assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
         return board.tostring()
 
     @staticmethod
