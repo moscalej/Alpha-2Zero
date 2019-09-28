@@ -36,8 +36,7 @@ class MCTS():
             probs: a policy vector where the probability of the ith action is
                    proportional to Nsa[(s,a)]**(1./temp)
         """
-        b = Board(canonical_board)
-        debug = b.decode_step_count()
+
         for i in range(self.args.numMCTSSims):
             self.branch_mem = {'deep': 0, 'b_s': 'ba', "ba": {}, "bb": {}}
             self.search(canonical_board.copy())
@@ -100,7 +99,7 @@ class MCTS():
             # leaf node
             polici_network, v_network = self.nnet.predict(canonical_board)
             valids = self.game.get_valid_moves(canonical_board, 1)
-            polici_network_mask = polici_network * valids  # masking invalid moves
+            polici_network_mask = polici_network * valids  # TODO maybe use sparse matrix
             sum_Ps_s = np.sum(polici_network_mask)
 
             if sum_Ps_s > 0:
@@ -124,35 +123,34 @@ class MCTS():
         next_branch = 'bb' if self.branch_mem['b_s'] == 'ba' else 'ba'
 
         # pick the action with the highest upper confidence bound
-        for action in range(self.game.get_action_size()):
-            if valids[action]:
-                if (state, action) in self.Qsa:
-                    # This provides some exploration if Nsa is small then u will be bigger --> explore less
-                    Qsa = self.Qsa[(state, action)]
-                    Ps_a = self.Ps[state][action]
-                    Ns = self.Ns[state]
-                    Nsa = self.Nsa[(state, action)]
-                    next_s, next_player = self.game.get_next_state(canonical_board, 1, action)
-                    next_s = self.game.get_canonical_form(next_s, next_player)
-                    next_string = self.game.string_representation(next_s)
-                    cpuct = self.args.cpuct
-                    if next_string in self.branch_mem[next_branch]:
-                        continue
-                    b = cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
-                    u = Qsa + cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
+        for action in np.where(valids)[0]:
+            if (state, action) in self.Qsa:
+                # This provides some exploration if Nsa is small then u will be bigger --> explore less
+                Qsa = self.Qsa[(state, action)]
+                Ps_a = self.Ps[state][action]
+                Ns = self.Ns[state]
+                Nsa = self.Nsa[(state, action)]
+                next_s, next_player = self.game.get_next_state(canonical_board, 1, action)
+                next_s = self.game.get_canonical_form(next_s, next_player)
+                next_string = self.game.string_representation(next_s)
+                cpuct = self.args.cpuct
+                if next_string in self.branch_mem[next_branch]:
+                    continue
+                b = cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
+                u = Qsa + cpuct * Ps_a * math.sqrt(Ns) / (1 + Nsa)
 
-                else:
-                    Ps_a = self.Ps[state][action]
-                    Ns = self.Ns[state]
-                    cpuct = self.args.cpuct
+            else:
+                Ps_a = self.Ps[state][action]
+                Ns = self.Ns[state]
+                cpuct = self.args.cpuct
 
-                    u = cpuct * Ps_a * math.sqrt(Ns + EPS)  # Q = 0 ?
+                u = cpuct * Ps_a * math.sqrt(Ns + EPS)  # Q = 0 ?
 
-                if u > cur_best:
-                    cur_best = u
-                    best_act = action
-                    # second_best = best_act
-                    # fird_best = second_best
+            if u > cur_best:
+                cur_best = u
+                best_act = action
+                # second_best = best_act
+                # fird_best = second_best
         if best_act == -1:
             return 1e-4
         action = best_act
