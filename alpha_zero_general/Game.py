@@ -111,3 +111,6 @@ class Game():
                          Required by MCTS for hashing.
         """
         pass
+
+    def print_board(self, board, action_code=None):
+        pass
