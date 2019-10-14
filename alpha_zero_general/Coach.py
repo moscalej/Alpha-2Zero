@@ -1,6 +1,7 @@
 from collections import deque
 from Arena import Arena
 from MCTS import MCTS
+from tqdm import tqdm
 import numpy as np
 import time, os, sys
 from pickle import Pickler, Unpickler
@@ -71,7 +72,6 @@ class Coach:
         board = self.game.get_init_board()
         self.curPlayer = 1
         episode_step = 0
-        verbose = True
         while True:
             episode_step += 1
             canonical_board = self.game.get_canonical_form(board, self.curPlayer)
@@ -143,7 +143,7 @@ class Coach:
             if not self.skipFirstSelfPlay or i > 1:
                 iteration_train_examples = deque([], maxlen=self.args.maxlenOfQueue)
 
-                for eps in range(self.args.numEps):
+                for eps in tqdm(range(self.args.numEps)):
                     self.mcts = MCTS(self.game, self.nnet, self.args)
                     results = self.execute_episode(verbose)
                     if results is not None:

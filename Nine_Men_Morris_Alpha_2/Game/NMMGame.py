@@ -91,7 +91,7 @@ class MenMorris(Game):
         flat_board = compress_tensor(board)
         b = Board(flat_board)
         b.decode_action(player, action)
-        board = decompress_tensor(board, b.matrix_board, player)
+        board = decompress_tensor(board, b.matrix_board)
         return board, -player
 
     def print_board(self, board: np.ndarray, action_code=None):
