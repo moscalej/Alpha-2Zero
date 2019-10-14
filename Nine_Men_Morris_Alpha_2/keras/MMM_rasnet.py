@@ -23,13 +23,13 @@ from keras.optimizers import *
 
 
 class NMM_NNet():
-    def __init__(self):
+    def __init__(self, game, args):
         # game params
         self.callbacks = []
         # self.board_x, self.board_y = game.get_board_size()
         # self.action_size = game.get_action_size()
         # self.args = args
-
+        self.resnet_v2((7, 7, 7), 20, 3001)
         # Neural Net
 
     def create_callbacks(self, filepath):
@@ -159,6 +159,7 @@ class NMM_NNet():
                               conv_first=True)
 
         # Instantiate the stack of residual units
+        num_filters_out = 0
         for stage in range(3):
             for res_block in range(num_res_blocks):
                 activation = 'relu'
@@ -219,6 +220,7 @@ class NMM_NNet():
         model = Model(inputs=inputs, outputs=[outputs_action, outputs_value])
 
         model.compile(loss=['categorical_crossentropy', "mean_squared_error"],
-                      # optimizer=Adam(learning_rate=self.lr_schedule(0)), )
-                      optimizer="Adam" )
+                      optimizer=Adam(lr=self.lr_schedule(0)), )
+                      # optimizer="Adam")
         model.summary()
+        self.model = model

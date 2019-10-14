@@ -1,9 +1,9 @@
-from Coach import Coach
+from alpha_zero_general.Coach import Coach
 
 # from othello.OthelloGame import OthelloGame as Game
 from Nine_Men_Morris_Alpha_2.Game.NMMGame import MenMorris as Game
 from Nine_Men_Morris_Alpha_2.keras.NNet import NNetWrapper as NeuralNetwork
-from utils import *
+from alpha_zero_general.utils import *
 
 args = dotdict({
     'numIters': 100,
@@ -17,7 +17,7 @@ args = dotdict({
     'n_importance' : 0.1,
     'epochs': 60,
     'checkpoint': './temp/',
-    'load_model': True,
+    'load_model': False,
     'load_folder_file': ('.\\temp', 'checkpoint_1.pth.tar'),
     'load_folder_Sample': ('.\\temp1', 'checkpoint_5.pth.tar.examples'),
     'numItersForTrainExamplesHistory': 20,

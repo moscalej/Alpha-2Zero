@@ -147,10 +147,10 @@ class Board(BaseMill):
         # return steps
         if board is None:
             board = self.matrix_board
-        bit3 = board[self.read_bits[3]]
-        bit2 = board[self.read_bits[2]]
-        bit1 = board[self.read_bits[1]]
-        bit0 = board[self.read_bits[0]]
+        bit3 = int(board[self.read_bits[3]])
+        bit2 = int(board[self.read_bits[2]])
+        bit1 = int(board[self.read_bits[1]])
+        bit0 = int(board[self.read_bits[0]])
         return int(f'0b{bit3}{bit2}{bit1}{bit0}', 2)
 
     def is_stage2(self):

@@ -10,11 +10,11 @@ import sys
 from alpha_zero_general.Game import Game
 
 sys.path.append('../..')
-from utils import *
-from NeuralNet import NeuralNet
+from alpha_zero_general.utils import *
+from alpha_zero_general.NeuralNet import NeuralNet
 
 import argparse
-from .NMM_NNet import NMM_NNet as onnet
+from .MMM_rasnet import NMM_NNet as onnet
 
 args = dotdict({
     'lr': 0.001,
@@ -30,7 +30,7 @@ args = dotdict({
 class NNetWrapper(NeuralNet):
     def __init__(self, game: Game):
         self.nnet = onnet(game, args)
-        self.board_x, self.board_y = game.get_board_size()
+        # self.board_x, self.board_y = game.get_board_size()
         self.action_size = game.get_action_size()
 
     def train(self, examples):

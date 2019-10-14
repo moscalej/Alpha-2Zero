@@ -71,7 +71,7 @@ class Coach:
         board = self.game.get_init_board()
         self.curPlayer = 1
         episode_step = 0
-
+        verbose = True
         while True:
             episode_step += 1
             canonical_board = self.game.get_canonical_form(board, self.curPlayer)
@@ -96,12 +96,12 @@ class Coach:
             # ########################
 
             if verbose:
-                b_1 = Board(canonical_board)
-                b_1.verbose_game(canonical_board, action)
+
+                self.game.print_board(canonical_board,action)
+
             new_board, new_player = self.game.get_next_state(board, self.curPlayer, action)
             if verbose:
-                b_2 = Board(new_board)
-                b_2.verbose_game(new_board)
+                self.game.print_board(new_board)
 
             response = self.game.get_game_ended(new_board, 1)
 
@@ -110,8 +110,7 @@ class Coach:
                 print("Simulated game end")
                 print(f"Number of iterations was {episode_step}")
                 print(f"Last move was done by {self.curPlayer}")
-                b_2 = Board(new_board)
-                b_2.verbose_game(new_board)
+                self.game.print_board(new_board)
                 winer = {
                     (1, 1): 'player 1',
                     (1, -1): 'player -1',

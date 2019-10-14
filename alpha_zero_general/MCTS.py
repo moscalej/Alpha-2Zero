@@ -190,4 +190,4 @@ class MCTS():
             self.Nsa[(state, action)] = 1
 
         self.Ns[state] += 1
-        return - v * 0.95
+        return - v * 0.99
