@@ -32,12 +32,13 @@ def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> n
     assert prev_tensor_board.shape == (7, 7, 7), "Invalid Input Shape "
     # this change made the time of the function to be half
     encoding_layer = Board.encoding_mask * new_board
+    clean_board = (1 - Board.encoding_mask) * new_board
     p1_mask = np.zeros([7, 7], dtype=np.int)
     p2_mask = np.zeros([7, 7], dtype=np.int)
-    p1_mask[np.where(new_board == 1)] = 1
-    p2_mask[np.where(new_board == -1)] = -1  # mask also negates values for player 2
-    p1_layer = new_board * p1_mask * (1 - Board.encoding_mask)  # Todo Need to check if a float number will give a error
-    p2_layer = new_board * p2_mask
+    p1_mask[np.where(clean_board == 1)] = 1
+    p2_mask[np.where(clean_board == -1)] = -1  # mask also negates values for player 2
+    p1_layer = clean_board * p1_mask  # Todo Need to check if a float number will give a error
+    p2_layer = clean_board * p2_mask
     # push older layers mapping: new board goes to : [2,3,4] (p1,step,p2) ; t0: [2,4] -> t_1: [1,5], t1: [1,5] -> [0,6]
     new_tensor_board = np.zeros([7, 7, 7])
     layer_mappings = [(1, 0), (2, 1), (4, 5), (5, 6)]  # (from, to)
