@@ -20,10 +20,12 @@ def compress_tensor(tensor_board: np.ndarray) -> np.ndarray:
     return compressed_board
 
 
-def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> np.ndarray:
+
+def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray, player:int) -> np.ndarray:
     """
     De-Compress state representation to 3 by 7 by 7 tensor board and push the older states out
     after obtimize the times it takes 36 us per run still really big
+    :param player:
     :param prev_tensor_board:
     :param new_board:
     :return: 7 by 7 by 7 np.ndarray
@@ -32,21 +34,31 @@ def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> n
     assert prev_tensor_board.shape == (7, 7, 7), "Invalid Input Shape "
     # this change made the time of the function to be half
     encoding_layer = Board.encoding_mask * new_board
-    clean_board = (1 - Board.encoding_mask) * new_board
-    p1_mask = np.zeros([7, 7], dtype=np.int)
-    p2_mask = np.zeros([7, 7], dtype=np.int)
-    p1_mask[np.where(clean_board == 1)] = 1
-    p2_mask[np.where(clean_board == -1)] = -1  # mask also negates values for player 2
-    p1_layer = clean_board * p1_mask  # Todo Need to check if a float number will give a error
-    p2_layer = clean_board * p2_mask
-    # push older layers mapping: new board goes to : [2,3,4] (p1,step,p2) ; t0: [2,4] -> t_1: [1,5], t1: [1,5] -> [0,6]
+    clean_board = Board.clean_mask * new_board
+
     new_tensor_board = np.zeros([7, 7, 7])
-    layer_mappings = [(1, 0), (2, 1), (4, 5), (5, 6)]  # (from, to)
-    for from_, to_ in layer_mappings:
-        new_tensor_board[to_, :, :] = prev_tensor_board[from_, :, :]
-    new_tensor_board[2, :, :] = p1_layer
-    new_tensor_board[3, :, :] = encoding_layer
-    new_tensor_board[4, :, :] = p2_layer
+    if player is 1:
+        p1_layer = np.zeros([7, 7], dtype=np.int)
+        p1_layer[np.where(clean_board == 1)] = 1
+        new_tensor_board[0] = prev_tensor_board[1]
+        new_tensor_board[1] = prev_tensor_board[2]
+        new_tensor_board[2] = p1_layer
+        new_tensor_board[3] = encoding_layer
+        new_tensor_board[4] = prev_tensor_board[4]
+        new_tensor_board[5] = prev_tensor_board[5]
+        new_tensor_board[6] = prev_tensor_board[6]
+    else:
+        p2_layer = np.zeros([7, 7], dtype=np.int)
+        p2_layer[np.where(clean_board == -1)] = 1  # mask also negates values for player 2
+        new_tensor_board[0] = prev_tensor_board[0]
+        new_tensor_board[1] = prev_tensor_board[1]
+        new_tensor_board[2] = prev_tensor_board[2]
+        new_tensor_board[3] = encoding_layer
+        new_tensor_board[4] = p2_layer
+        new_tensor_board[5] = prev_tensor_board[4]
+        new_tensor_board[6] = prev_tensor_board[5]
+
+
     return new_tensor_board
 
 
@@ -88,7 +100,7 @@ class MenMorris(Game):
         flat_board = compress_tensor(board)
         b = Board(flat_board)
         b.decode_action(player, action)
-        board = decompress_tensor(board, b.matrix_board)
+        board = decompress_tensor(board, b.matrix_board, player)
         return board, -player
 
     def print_board(self, board: np.ndarray, action_code=None):

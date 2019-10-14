@@ -49,7 +49,7 @@ class Coach:
         # from args.numItersForTrainExamplesHistory latest iterations
         self.skipFirstSelfPlay = False  # can be overriden in loadTrainExamples()
         self.curPlayer = None
-        self.name ="Jorge"
+        self.name = "Jorge"
 
     def execute_episode(self, verbose) -> list:
         """
@@ -96,8 +96,7 @@ class Coach:
             # ########################
 
             if verbose:
-
-                self.game.print_board(canonical_board,action)
+                self.game.print_board(canonical_board, action)
 
             new_board, new_player = self.game.get_next_state(board, self.curPlayer, action)
             if verbose:

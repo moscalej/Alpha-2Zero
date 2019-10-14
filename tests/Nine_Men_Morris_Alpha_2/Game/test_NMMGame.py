@@ -252,7 +252,7 @@ class TestMMGame(unittest.TestCase):
                          "Output is not as expected")
 
     def test_decompress_tensor(self):
-        out = decompress_tensor(EXAMPLE_TENSOR, EXAMPLE_OUTPUT)
+        out = decompress_tensor(EXAMPLE_TENSOR, EXAMPLE_OUTPUT, )
 
         for layer in range(7):
             for row in range(7):
