@@ -21,7 +21,8 @@ def compress_tensor(tensor_board: np.ndarray) -> np.ndarray:
 
 
 
-def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray, player:int) -> np.ndarray:
+
+def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> np.ndarray:
     """
     De-Compress state representation to 3 by 7 by 7 tensor board and push the older states out
     after obtimize the times it takes 36 us per run still really big
@@ -35,29 +36,19 @@ def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray, play
     # this change made the time of the function to be half
     encoding_layer = Board.encoding_mask * new_board
     clean_board = Board.clean_mask * new_board
-
+    p2_layer = np.zeros([7, 7], dtype=np.int)
+    p2_layer[np.where(clean_board == -1)] = 1  # mask also negates values for player 2
     new_tensor_board = np.zeros([7, 7, 7])
-    if player is 1:
-        p1_layer = np.zeros([7, 7], dtype=np.int)
-        p1_layer[np.where(clean_board == 1)] = 1
-        new_tensor_board[0] = prev_tensor_board[1]
-        new_tensor_board[1] = prev_tensor_board[2]
-        new_tensor_board[2] = p1_layer
-        new_tensor_board[3] = encoding_layer
-        new_tensor_board[4] = prev_tensor_board[4]
-        new_tensor_board[5] = prev_tensor_board[5]
-        new_tensor_board[6] = prev_tensor_board[6]
-    else:
-        p2_layer = np.zeros([7, 7], dtype=np.int)
-        p2_layer[np.where(clean_board == -1)] = 1  # mask also negates values for player 2
-        new_tensor_board[0] = prev_tensor_board[0]
-        new_tensor_board[1] = prev_tensor_board[1]
-        new_tensor_board[2] = prev_tensor_board[2]
-        new_tensor_board[3] = encoding_layer
-        new_tensor_board[4] = p2_layer
-        new_tensor_board[5] = prev_tensor_board[4]
-        new_tensor_board[6] = prev_tensor_board[5]
 
+    p1_layer = np.zeros([7, 7], dtype=np.int)
+    p1_layer[np.where(clean_board == 1)] = 1
+    new_tensor_board[0] = prev_tensor_board[1]
+    new_tensor_board[1] = prev_tensor_board[2]
+    new_tensor_board[2] = p1_layer
+    new_tensor_board[3] = encoding_layer
+    new_tensor_board[4] = p2_layer
+    new_tensor_board[5] = prev_tensor_board[4]
+    new_tensor_board[6] = prev_tensor_board[5]
 
     return new_tensor_board
 
