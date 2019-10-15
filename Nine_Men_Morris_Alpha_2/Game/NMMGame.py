@@ -20,8 +20,6 @@ def compress_tensor(tensor_board: np.ndarray) -> np.ndarray:
     return compressed_board
 
 
-
-
 def decompress_tensor(prev_tensor_board: np.ndarray, new_board: np.ndarray) -> np.ndarray:
     """
     De-Compress state representation to 3 by 7 by 7 tensor board and push the older states out
@@ -68,6 +66,7 @@ class MenMorris(Game):
         super(MenMorris, self).__init__()
         self.men_count = men_count
         self.actionSize = 24 * 5 * 25 + 1
+        # self.logger = open(r'train_log.txt')
 
     def get_init_board(self):
         # return initial board (numpy board)
@@ -94,10 +93,7 @@ class MenMorris(Game):
         board = decompress_tensor(board, b.matrix_board)
         return board, -player
 
-    def print_board(self, board: np.ndarray, action_code=None):
-        flat_board = compress_tensor(board)
-        b = Board(flat_board)
-        b.verbose_game(flat_board, action_code=action_code)
+
 
     def get_valid_moves(self, board: np.ndarray, player: int) -> np.ndarray:
         # return a fixed size binary vector
@@ -148,8 +144,18 @@ class MenMorris(Game):
         assert board.shape == (7, 7, 7), f'An incorrect shape was given, expected was 7,7,7 given was {board.shape}'
         return Board(compress_tensor(board))
 
+    def log_moves(self, pi: [float], values,counts, flat=0.01):
+        vals = pi > flat
+        for move in np.where(vals)[0]:
+            piece, action, remove = np.unravel_index(move, (24, 5, 25), 'C')
+            piece = Board.board_map[piece]
+            action = ['up   ', 'down ', 'left ', 'right', 'set   '][action]
+            remove = Board.board_map[remove]
+            print(f"Piece: {piece}, action: {action} remove:"
+                  f" {remove} with prob: {pi[move]:.2f} number: {move} ex_val: {values[move]:.2f}, visits: {counts[move]:.2f}")
+            # self.logger.write(f"Move pick piece {piece}, action, {action} remove {remove} with prob {pi[move]}")
 
-@jit(nopython=True)
-def get_board(matrix_board):
-    for val in Board.board_map.values():
-        pass
+    def print_board(self, board: np.ndarray, action_code=None):
+        flat_board = compress_tensor(board)
+        b = Board(flat_board)
+        b.verbose_game(flat_board, action_code=action_code)

@@ -55,6 +55,7 @@ class BaseMill:
         21: (4, 2),
         22: (4, 3),
         23: (4, 4),
+        24: None
     }
     board_map_alt = {
         0: (0, 0),

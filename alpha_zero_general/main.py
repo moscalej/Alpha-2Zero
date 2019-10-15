@@ -7,14 +7,14 @@ from alpha_zero_general.utils import *
 
 args = dotdict({
     'numIters': 100,
-    'numEps': 10,
+    'numEps': 100,
     'tempThreshold': 15,
     'updateThreshold': 0.6,
     'maxlenOfQueue': 300000,
-    'numMCTSSims': 25,
+    'numMCTSSims': 35,
     'arenaCompare': 10,
     'cpuct': 0.01,
-    'n_importance' : 0.1,
+    'n_importance': 0.1,
     'epochs': 60,
     'checkpoint': './temp/',
     'load_model': False,
@@ -24,9 +24,10 @@ args = dotdict({
 
 })
 
-if __name__=="__main__":
+if __name__ == "__main__":
     # debug
     import sys
+
     # print(sys.getrecursionlimit())
     # sys.setrecursionlimit(10000)
     #
@@ -42,4 +43,4 @@ if __name__=="__main__":
 
         print("Load trainExamples from file")
         # coach.loadTrainExamples()
-    coach.learn(verbose = False)
+    coach.learn(verbose=False)

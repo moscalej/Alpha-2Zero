@@ -21,7 +21,7 @@ args = dotdict({
     'maxlenOfQueue': 200000,
     'numMCTSSims': 25,
     'arenaCompare': 40,
-    'n_importance' : 0.04,
+    'n_importance' : 0.14,
     'cpuct': 0.04,
     'epochs': 40,
     'checkpoint': r'C:\Users\amoscoso\Documents\Technion\deeplearning\Alpha-2Zero\alpha_zero_general\temp',
@@ -55,7 +55,7 @@ def player_ramdon(board):
 print('Let the fight Begin')
 arena = Arena(lambda x: np.argmax(our_player.get_action_prob(x)),
               player_ramdon,
-              game, lambda x: Board(x).verbose_game(x),"Alpha_Zero", "Random")
+              game, lambda x: game.print_board(x),"Alpha_Zero", "Random")
 print(arena.playGames(40, verbose=True))
 #
 

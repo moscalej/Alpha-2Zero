@@ -72,11 +72,12 @@ class Coach:
         board = self.game.get_init_board()
         self.curPlayer = 1
         episode_step = 0
+        verbose = True
         while True:
             episode_step += 1
             canonical_board = self.game.get_canonical_form(board, self.curPlayer)
             temp = int(episode_step < self.args.tempThreshold)
-            pi = self.mcts.get_action_prob(canonical_board.copy(), temp=temp)
+            pi, counts , values = self.mcts.get_action_prob(canonical_board.copy(), temp=temp)
             train_examples.append((canonical_board.copy(), self.curPlayer, pi.copy(), None))
             action = np.random.choice(len(pi), p=pi)
 
@@ -97,6 +98,8 @@ class Coach:
 
             if verbose:
                 self.game.print_board(canonical_board, action)
+                self.game.log_moves(pi, values,counts)
+                print("we choose ", action)
 
             new_board, new_player = self.game.get_next_state(board, self.curPlayer, action)
             if verbose:

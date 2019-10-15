@@ -36,6 +36,9 @@ class MCTS():
             probs: a policy vector where the probability of the ith action is
                    proportional to Nsa[(s,a)]**(1./temp)
         """
+        # self.Qsa = {}  # stores Q values for s,a (as defined in the paper)
+        # self.Nsa = {key: 0 for key in self.Nsa}  # stores #times edge s,a was visited
+        # self.Ns = {}
 
         for i in range(self.args.numMCTSSims):
             self.branch_mem = {'deep': 0, 'b_s': 'ba', "ba": {}, "bb": {}}
@@ -43,6 +46,7 @@ class MCTS():
 
         s = self.game.string_representation(canonical_board)
         counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.get_action_size())]
+        values = [self.Qsa[(s, a)] if (s, a) in self.Qsa else 0 for a in range(self.game.get_action_size())]
 
         if False:
             bestA = np.argmax(counts)
@@ -52,7 +56,7 @@ class MCTS():
 
         counts = np.array(counts).copy()
         probs = counts / sum(counts)
-        return probs
+        return probs, counts, values
 
     def search(self, canonical_board, verbose=False):
         """
@@ -179,8 +183,8 @@ class MCTS():
 
         if (state, action) in self.Qsa:  # if (s,a) exists, update, otherwise, set
 
-            Nsa = self.Nsa[(state,action)]
-            Qsa = self.Qsa[(state,action)]
+            Nsa = self.Nsa[(state, action)]
+            Qsa = self.Qsa[(state, action)]
             quality = (Nsa * Qsa + v) / (Nsa + 1)
             self.Qsa[(state, action)] = quality
             self.Nsa[(state, action)] += 1

@@ -114,3 +114,5 @@ class Game():
 
     def print_board(self, board, action_code=None):
         pass
+    def log_moves(self, pi: [float],values, counts,flat=0.01):
+        pass
